@@ -12,7 +12,7 @@ import us.schueler.cando.utilities.Cando
 @CompileStatic
 @CommandLine.Command(
         name = "cando",
-        version = "0.1",
+        versionProvider = VersionProvider,
         mixinStandardHelpOptions = true, // add --help and --version options
         description = """See what you can do and do it""")
 @Slf4j
