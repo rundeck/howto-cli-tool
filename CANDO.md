@@ -7,40 +7,46 @@ You can easily define actions a markdown-formatted text file just like this one.
 
 Cando can also look for common build systems, such as NPM, Gradle, etc, and provide shortcuts to invoking them, if you want.
 
-Define H2 headings for each action you want to define.
+Define H2 headings for each action you want to define. The heading will be the name of the action.
 
-## build
+Within the H2 section, use a code block, or code section to define the action to invoke.
+
+If you want to accept arguments use `"${@}"` (for bash) 
+
+## Build
 
 Build the project with Gradle
 
     ./gradlew build
 
-## test
+## Test
 
 Test the project with Gradle
 
     ./gradlew check
 
-## install
+## Install
 
 Build and install locally with Gradle
 
     ./gradlew :app:installDist
 
-## local
+## Local
 
 Run local installation
 
     ./app/build/install/cando/bin/cando "$@"
 
-## pond
+## Pond
 
 Toss a coin in the pond!
 
     #!/bin/bash
-    echo "Today you will have:\n"
-    R=$(( $RANDOM % 4 ))
-    [ $R = 0 ] && echo "A little luck."
-    [ $R = 1 ] && echo "Good luck."
-    [ $R = 2 ] && echo "Great luck."
-    [ $R = 3 ] && echo "Big trouble."
+    echo "Today you will have:"
+    echo
+    case "$(( $RANDOM % 4 ))" in
+    0) echo "A little luck.";;
+    1) echo "Good luck." ;;
+    2) echo "Great luck.";;
+    3) echo "Big trouble.";;
+    esac

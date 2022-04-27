@@ -5,7 +5,7 @@ package us.schueler.cando.app
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import groovyjarjarpicocli.CommandLine
+import picocli.CommandLine
 import us.schueler.cando.utilities.Cando
 
 
@@ -13,8 +13,6 @@ import us.schueler.cando.utilities.Cando
 @CommandLine.Command(
         name = "cando",
         version = "0.1",
-        subcommands = [
-        ],
         mixinStandardHelpOptions = true, // add --help and --version options
         description = """See what you can do and do it""")
 @Slf4j
@@ -24,7 +22,7 @@ class App {
     }
 
 
-    @CommandLine.Command(name = 'help', description = 'Show available actions')
+    @CommandLine.Command(name = 'help', aliases = ['list', 'ls'], description = 'List available actions')
     void help(
             @CommandLine.Option(names = ['-d', '--dir'], description = 'Base dir') File baseDir,
             @CommandLine.Option(names = ['-v', '--verbose'], description = 'Verbose') boolean verbose
@@ -38,8 +36,8 @@ class App {
     void run(
             @CommandLine.Option(names = ['-d', '--dir'], description = 'Base dir') File baseDir,
             @CommandLine.Option(names = ['-v', '--verbose'], description = 'Verbose') boolean verbose,
-            String action,
-            List<String> args
+            @CommandLine.Parameters(paramLabel = 'action') String action,
+            @CommandLine.Parameters(paramLabel = 'args', description = "args passed to the action") List<String> args
     ) {
         Cando cando = Cando.create(baseDir ?: new File("."))
         cando.verbose = verbose

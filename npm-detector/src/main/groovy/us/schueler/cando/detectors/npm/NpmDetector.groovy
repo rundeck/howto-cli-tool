@@ -36,9 +36,9 @@ class NpmDetector implements Detector {
                     type: 'npm',
                     name: k,
                     title: k,
-                    description: """NPM script: ${k}
+                    description: """Runs npm script "${k}"
 
-* action: `${v}`""" ,
+> ${v}""" ,
                     invocationString: 'npm run ' + k,
                     sourceFile: jsonFile
             ))

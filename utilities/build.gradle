@@ -13,4 +13,5 @@ repositories{
 dependencies {
     // Use the latest Groovy version for building this library
     implementation 'org.codehaus.groovy:groovy-all:3.0.10'
+    implementation 'info.picocli:picocli:4.6.3'
 }

@@ -13,10 +13,6 @@ class HelpDetector implements Detector {
     List<DiscoveredAction> getActions(Cando cando) {
         List<DiscoveredAction> actions = new ArrayList<>()
         actions.add new HelpAction(
-                type: 'help',
-                name: 'help',
-                title: 'Help',
-                description: 'List available cando actions'
         )
         actions
     }
