@@ -38,22 +38,15 @@ class Cando {
 
 
     DiscoveredAction findAction(String name) {
-        String type = '*'
         String action = name
-        if (name.contains(':')) {
-            def split = name.split(':', 2)
-            if (split.length == 2) {
-                type = split[0]
-                action = split[1]
-            }
-        }
         for (Detector detector : detectors) {
             def local = detector.getActions(this).find {
-                it.name == action && (type in [it.type, '*'])
+                it.name == action
             }
             if (local) {
                 return local
             }
         }
+        null
     }
 }
