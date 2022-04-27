@@ -18,6 +18,12 @@ import us.schueler.cando.utilities.Cando
 @Slf4j
 class App {
     static void main(String[] args) {
+        if (args.length > 0 && args[0] !in ['-V', '--version', '-h', '--help', 'help', 'ls', 'list', 'run']) {
+            //assume a run command is intended
+            args = new ArrayList<String>(['run'] + args.toList()).toArray(new String[]{})
+        } else if (args.length == 0) {
+            args = ['help'].toArray(new String[1])
+        }
         System.exit(new CommandLine(new App()).execute(args))
     }
 
