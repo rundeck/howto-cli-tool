@@ -3,9 +3,7 @@
  */
 
 plugins {
-    id 'us.schueler.cando.groovy-library-conventions'
 }
 
 dependencies {
-    api project(':list')
 }
