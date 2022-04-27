@@ -15,16 +15,15 @@ class HelpAction extends BaseAction {
 
     @Override
     void invoke(Cando cando, List<String> args) {
-        int count = 1
-        printPlain(cando, count)
+        printPlain(cando)
     }
 
-    private void printPlain(Cando cando, int count) {
+    private void printPlain(Cando cando) {
+        int count = 0
         println Ansi.AUTO.string("""Here's what you can do:
 
 @|green cando run|@ @|white [action]|@ [args]
 
-actions:
 """)
         Map<String, Map<String, String>> cmds = [:]
         cando.detectors.each { Detector detector ->
@@ -35,6 +34,11 @@ actions:
                 cmds.put(it.name, [description: it.description, invocationString: it.invocationString?.trim()])
                 count++
             }
+        }
+        if (count > 0) {
+            println "Actions:\n"
+        } else {
+            println Ansi.AUTO.string("@|faint No actions were found.|@")
         }
         int max = cmds.keySet().collect { it.size() }.max()
         cmds.each { String name, Map<String, String> data ->
