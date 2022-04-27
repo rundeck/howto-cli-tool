@@ -3,7 +3,14 @@
  */
 
 plugins {
+    // Apply the groovy Plugin to add support for Groovy.
+    id 'groovy'
+}
+repositories{
+    mavenCentral()
 }
 
 dependencies {
+    // Use the latest Groovy version for building this library
+    implementation 'org.codehaus.groovy:groovy-all:3.0.10'
 }

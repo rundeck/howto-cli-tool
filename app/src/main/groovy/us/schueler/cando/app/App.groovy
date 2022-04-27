@@ -3,19 +3,46 @@
  */
 package us.schueler.cando.app
 
-import us.schueler.cando.list.LinkedList
+import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
+import groovyjarjarpicocli.CommandLine
+import us.schueler.cando.utilities.Cando
 
-import static us.schueler.cando.utilities.StringUtils.join
-import static us.schueler.cando.utilities.StringUtils.split
-import static us.schueler.cando.app.MessageUtils.getMessage
 
-import org.apache.commons.text.WordUtils
-
+@CompileStatic
+@CommandLine.Command(
+        name = "cando",
+        version = "0.1",
+        subcommands = [
+        ],
+        mixinStandardHelpOptions = true, // add --help and --version options
+        description = """See what you can do and do it""")
+@Slf4j
 class App {
     static void main(String[] args) {
-        LinkedList tokens
-        tokens = split(getMessage())
-        String result = join(tokens)
-        println(WordUtils.capitalize(result))
+        System.exit(new CommandLine(new App()).execute(args))
+    }
+
+
+    @CommandLine.Command(name = 'help', description = 'Show available actions')
+    void help(
+            @CommandLine.Option(names = ['-d', '--dir'], description = 'Base dir') File baseDir,
+            @CommandLine.Option(names = ['-v', '--verbose'], description = 'Verbose') boolean verbose
+    ) {
+        Cando cando = Cando.create(baseDir ?: new File("."))
+        cando.verbose = verbose
+        cando.invoke('help', null)
+    }
+
+    @CommandLine.Command(name = 'run', description = 'Run an action')
+    void run(
+            @CommandLine.Option(names = ['-d', '--dir'], description = 'Base dir') File baseDir,
+            @CommandLine.Option(names = ['-v', '--verbose'], description = 'Verbose') boolean verbose,
+            String action,
+            List<String> args
+    ) {
+        Cando cando = Cando.create(baseDir ?: new File("."))
+        cando.verbose = verbose
+        cando.invoke(action, args)
     }
 }

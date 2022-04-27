@@ -1,43 +1,46 @@
 
 # Welcome to cando
 
-Cando lets you easily run predefined actions defined in a markdown-formatted text file - just like this one.
+Cando lets you easily run predefined actions from a variety of sources.
+
+You can easily define actions a markdown-formatted text file just like this one.
+
+Cando can also look for common build systems, such as NPM, Gradle, etc, and provide shortcuts to invoking them, if you want.
 
 Define H2 headings for each action you want to define.
 
-## Gradle: build
+## build
 
-You can build the project easily with:
+Build the project with Gradle
 
     ./gradlew build
 
-alias
-:   gradle:build
+## test
 
-## Gradle: test
-you can test with:
+Test the project with Gradle
 
     ./gradlew check
 
+## install
 
-alias
-:   gradle:test
-
-## Gradle: local install
-
-You can build and install locally using:
+Build and install locally with Gradle
 
     ./gradlew :app:installDist
 
+## local
 
-alias
-:   gradle:local-install
+Run local installation
 
-## Run local install
+    ./app/build/install/cando/bin/cando "$@"
 
-You can run the local install of this project using (cando-ception)
+## pond
 
-    sh app/install/dist/cando/bin/cando "$@"
+Toss a coin in the pond!
 
-alias
-:   local
+    #!/bin/bash
+    echo "Today you will have:\n"
+    R=$(( $RANDOM % 4 ))
+    [ $R = 0 ] && echo "A little luck."
+    [ $R = 1 ] && echo "Good luck."
+    [ $R = 2 ] && echo "Great luck."
+    [ $R = 3 ] && echo "Big trouble."

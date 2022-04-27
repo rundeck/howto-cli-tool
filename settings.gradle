@@ -9,3 +9,6 @@
 
 rootProject.name = 'cando'
 include('app', 'utilities')
+include 'npm-detector'
+include 'markdown-detector'
+

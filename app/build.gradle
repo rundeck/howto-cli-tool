@@ -3,15 +3,53 @@
  */
 
 plugins {
-    id 'us.schueler.cando.groovy-application-conventions'
+    // Apply the groovy Plugin to add support for Groovy.
+    id 'groovy'
+
+    // Apply the application plugin to add support for building a CLI application in Java.
+    id 'application'
 }
 
-dependencies {
-    implementation 'org.apache.commons:commons-text'
-    implementation project(':utilities')
+repositories {
+    // Use Maven Central for resolving dependencies.
+    mavenCentral()
 }
+
 
 application {
     // Define the main class for the application.
     mainClass = 'us.schueler.cando.app.App'
+    applicationName = 'cando'
+}
+
+repositories {
+    // Use Maven Central for resolving dependencies.
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':utilities')
+    implementation project(':npm-detector')
+    implementation project(':markdown-detector')
+    // Use the latest Groovy version for building this library
+    implementation 'org.codehaus.groovy:groovy-all:3.0.10'
+
+    implementation 'info.picocli:picocli:4.6.3'
+    annotationProcessor 'info.picocli:picocli-codegen:4.6.3'
+
+    // This dependency is used by the application.
+    implementation 'org.slf4j:slf4j-api:1.7.36'
+    implementation 'org.slf4j:slf4j-simple:1.7.36'
+
+    // Use the awesome Spock testing and specification framework even with Java
+    testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
+    testImplementation 'junit:junit:4.13.2'
+}
+compileJava {
+    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+}
+
+tasks.named('test') {
+    // Use JUnit Platform for unit tests.
+    useJUnitPlatform()
 }
