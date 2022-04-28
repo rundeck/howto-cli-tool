@@ -38,5 +38,5 @@ interface DiscoveredAction {
      * Invoke the action
      * @param args
      */
-    void invoke(Howto howto, List<String> args)
+    int invoke(Howto howto, List<String> args)
 }

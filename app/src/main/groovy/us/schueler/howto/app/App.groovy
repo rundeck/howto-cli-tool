@@ -29,7 +29,7 @@ class App {
 
 
     @CommandLine.Command(name = 'help', aliases = ['list', 'ls', 'to'], description = 'List available actions')
-    void help(
+    int help(
             @CommandLine.Option(names = ['-d', '--dir'], description = 'Base dir') File baseDir,
             @CommandLine.Option(names = ['-v', '--verbose'], description = 'Verbose') boolean verbose,
             @CommandLine.Parameters(paramLabel = 'args', description = "args passed to the action") List<String> args
@@ -38,7 +38,7 @@ class App {
     }
 
     @CommandLine.Command(name = 'run', aliases = ['do'], description = 'Run an action')
-    void run(
+    int run(
             @CommandLine.Option(names = ['-d', '--dir'], description = 'Base dir') File baseDir,
             @CommandLine.Option(names = ['-v', '--verbose'], description = 'Verbose') boolean verbose,
             @CommandLine.Parameters(paramLabel = 'action') String action,
@@ -46,6 +46,12 @@ class App {
     ) {
         Howto howto = Howto.create(baseDir ?: new File("."))
         howto.verbose = verbose
-        howto.invoke(action, args)
+
+        def val = howto.invoke(action, args)
+        if (val < 0) {
+            println "Action not found: $action"
+            return 1
+        }
+        val
     }
 }

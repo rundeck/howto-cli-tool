@@ -14,8 +14,9 @@ class HelpAction extends BaseAction {
     String description = 'List available Howto actions.'
 
     @Override
-    void invoke(Howto howto, List<String> args) {
+    int invoke(Howto howto, List<String> args) {
         printPlain(howto, args)
+        0
     }
 
     private void printPlain(Howto howto, List<String> args) {

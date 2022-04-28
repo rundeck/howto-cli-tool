@@ -6,7 +6,7 @@ import us.schueler.howto.Howto
 @CompileStatic
 class CommandAction extends BaseAction {
     @Override
-    void invoke(Howto howto, List<String> args) {
+    int invoke(Howto howto, List<String> args) {
         def invocation = getInvocation(args)
         if (!invocation) {
             println "TODO: unable to automatically execute the action on this OS, sorry!"
@@ -19,10 +19,7 @@ class CommandAction extends BaseAction {
                 directory(howto.baseDir).
                 inheritIO().
                 start()
-        int result = proc.waitFor()
-        if (result != 0) {
-            System.exit(result)
-        }
+        return proc.waitFor()
     }
 
     private List<String> getInvocation(List<String> args) {
