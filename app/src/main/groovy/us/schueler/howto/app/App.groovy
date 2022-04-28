@@ -18,7 +18,7 @@ import us.schueler.howto.Howto
 @Slf4j
 class App {
     static void main(String[] args) {
-        if (args.length > 0 && args[0] !in ['-V', '--version', '-h', '--help', 'help', 'ls', 'list', 'run']) {
+        if (args.length > 0 && args[0] !in ['-V', '--version', '-h', '--help', 'help', 'ls', 'list', 'run', 'do', 'to']) {
             //assume a run command is intended
             args = new ArrayList<String>(['run'] + args.toList()).toArray(new String[]{})
         } else if (args.length == 0) {
@@ -28,17 +28,16 @@ class App {
     }
 
 
-    @CommandLine.Command(name = 'help', aliases = ['list', 'ls'], description = 'List available actions')
+    @CommandLine.Command(name = 'help', aliases = ['list', 'ls', 'to'], description = 'List available actions')
     void help(
             @CommandLine.Option(names = ['-d', '--dir'], description = 'Base dir') File baseDir,
-            @CommandLine.Option(names = ['-v', '--verbose'], description = 'Verbose') boolean verbose
+            @CommandLine.Option(names = ['-v', '--verbose'], description = 'Verbose') boolean verbose,
+            @CommandLine.Parameters(paramLabel = 'args', description = "args passed to the action") List<String> args
     ) {
-        Howto howto = Howto.create(baseDir ?: new File("."))
-        howto.verbose = verbose
-        howto.invoke('help', null)
+        run(baseDir, args?.size() > 0 || verbose, 'help', args)
     }
 
-    @CommandLine.Command(name = 'run', description = 'Run an action')
+    @CommandLine.Command(name = 'run', aliases = ['do'], description = 'Run an action')
     void run(
             @CommandLine.Option(names = ['-d', '--dir'], description = 'Base dir') File baseDir,
             @CommandLine.Option(names = ['-v', '--verbose'], description = 'Verbose') boolean verbose,
