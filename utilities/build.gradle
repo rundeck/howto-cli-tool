@@ -14,9 +14,17 @@ repositories {
 }
 
 dependencies {
+    implementation 'com.atlassian.commonmark:commonmark:0.17.0'
+    implementation 'com.atlassian.commonmark:commonmark-ext-autolink:0.17.0'
     // Use the latest Groovy version for building this library
     implementation 'org.codehaus.groovy:groovy-all:3.0.10'
     implementation 'info.picocli:picocli:4.6.3'
+    testImplementation 'org.spockframework:spock-core:2.1-groovy-3.0'
+    testImplementation 'junit:junit:4.13.2'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 buildConfig {

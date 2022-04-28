@@ -1,52 +1,53 @@
 package us.schueler.howto
 
 import groovy.transform.CompileStatic
+import groovy.transform.Memoized
 import us.schueler.howto.detectors.Detector
+import us.schueler.howto.detectors.help.HelpDetector
+import us.schueler.howto.detectors.markdown.MarkdownDetector
 import us.schueler.howto.model.DiscoveredAction
 
 @CompileStatic
 class Howto {
+    static ServiceLoader<Detector> detectorLoader = ServiceLoader.load(Detector)
     File baseDir
-    List<Detector> detectors = []
+    List<Detector> detectors = detectorLoader.toList()
+
     boolean verbose
+    boolean all
 
     Howto(File baseDir) {
         this.baseDir = baseDir
     }
-    static ServiceLoader<Detector> detectorLoader = ServiceLoader.load(Detector)
 
     static Howto create(File file) {
-        Howto howto = new Howto(file)
-        for (Detector detector : detectorLoader) {
-            howto.detectors.add detector
+        new Howto(file)
+    }
+
+    //cache results
+    @Memoized
+    List<DiscoveredAction> getDetectedActions() {
+        List<DiscoveredAction> detectedActions = []
+        detectedActions.addAll(new HelpDetector().getActions(this))
+        def mdactions = new MarkdownDetector().getActions(this)
+        if (mdactions) {
+            detectedActions.addAll(mdactions)
         }
-        howto
+        if (!mdactions || all) {
+            for (Detector detector : detectors) {
+                detectedActions.addAll(detector.getActions(this))
+            }
+        }
+        detectedActions
     }
 
-    List<Detector> detect() {
-        return detectors
-    }
-
-    void invoke(String name, List<String> args) {
-        DiscoveredAction action = findAction(name)
+    int invoke(String name, List<String> args) {
+        DiscoveredAction action = detectedActions.find { it.name == name }
         if (!action) {
-            println "Action not found $name. Try: how help"
-            return
+            return -1
         }
         action.invoke(this, args)
     }
 
 
-    DiscoveredAction findAction(String name) {
-        String action = name
-        for (Detector detector : detectors) {
-            def local = detector.getActions(this).find {
-                it.name == action
-            }
-            if (local) {
-                return local
-            }
-        }
-        null
-    }
 }
