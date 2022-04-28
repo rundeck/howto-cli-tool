@@ -49,10 +49,12 @@ class HelpAction extends BaseAction {
         cmds.each { String name, Map<String, String> data ->
             if (howto.verbose) {
                 println Ansi.AUTO.string("@|white ${name}|@: \n")
-                println indentString('    ', data.description.trim())
+                if(data.description){
+                    println indentString('    ', data.description.trim())
+                }
             } else {
                 String named =  (name + (" " * ((max+1) - name.size())))
-                def shortDesc = data.description.split('[\n\r]', 2)[0]
+                def shortDesc = data.description?data.description.split('[\n\r]', 2)[0]:''
                 println Ansi.AUTO.string("@|white ${named}|@: ${shortDesc}")
             }
             if (howto.verbose && data.invocationString) {
