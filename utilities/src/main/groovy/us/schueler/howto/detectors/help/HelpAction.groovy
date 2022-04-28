@@ -45,13 +45,13 @@ class HelpAction extends BaseAction {
         if (count < 1) {
             println Ansi.AUTO.string("@|faint No actions were found.|@")
         }
-        int max = cmds.keySet().collect { it.size() }.max() +1
+        int max = cmds.keySet().collect { it.size() }?.max()
         cmds.each { String name, Map<String, String> data ->
             if (howto.verbose) {
                 println Ansi.AUTO.string("@|white ${name}|@: \n")
                 println indentString('    ', data.description.trim())
             } else {
-                String named = name.size() < max ? (name + (" " * (max - name.size()))) : name
+                String named = name.size() < max ? (name + (" " * ((max+1) - name.size()))) : name
                 def shortDesc = data.description.split('[\n\r]', 2)[0]
                 println Ansi.AUTO.string("@|white ${named}|@: ${shortDesc}")
             }
