@@ -102,4 +102,56 @@ more action
         'unrelated'              | 'howto'        | MarkdownDetector.HOWTO_H1_PATTERN | ['something-else']
         'howto: project'         | 'howto: other' | MarkdownDetector.HOWTO_H1_PATTERN | ['action-2', 'action-3', 'something-else']
     }
+
+    def "example"() {
+        given:
+        String doc = """# header
+ignored
+
+# howto do something else
+
+ignored
+
+# bbq
+
+ignored
+
+## action1
+
+description
+
+    action words
+
+# other
+
+## action 2
+
+more
+
+description
+
+`another action`
+
+## action 3
+
+blah
+
+```
+more action
+```
+
+# blah
+
+## something else
+
+`blah`
+"""
+        List<DiscoveredAction> actions = []
+        when:
+        MarkdownDetector.parseActions(new ByteArrayInputStream(doc.bytes), null, actions)
+        then:
+        actions*.name == expect
+        where:
+        expect = ['action1', 'action-2', 'action-3', 'something-else']
+    }
 }

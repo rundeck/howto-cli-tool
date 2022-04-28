@@ -11,6 +11,7 @@ import us.schueler.howto.model.DiscoveredAction
 
 import java.util.function.Consumer
 import java.util.regex.Pattern
+
 /**
  * Detects "howto.md" or "howto.markdown" file,
  * parses out H2 sections to define howto actions
@@ -47,43 +48,65 @@ class MarkdownDetector implements Detector {
         return null
     }
 
+    static enum ParseState {
+        NONE,
+        H1,
+        H2,
+        H2_CONTENT
+    }
+
     static class DocVisitor extends AbstractVisitor {
         List<DiscoveredAction> actions = []
-        CommandAction state = new CommandAction(type: 'markdown')
+        CommandAction action = new CommandAction(type: 'markdown')
         Pattern h1search = null
-        boolean h1Context = false
-        boolean h2Context = false
         Consumer<String> textCapture = null
+        ParseState state = ParseState.NONE
+
+        void visitH1(Heading heading) {
+            String h1literal = null
+            textCapture = { String s -> h1literal = s }
+
+            visitChildren(heading)
+
+            boolean matchedHeader = h1search && h1literal && h1search.matcher(h1literal).matches() || !h1search
+
+            if (matchedHeader) {
+                state = ParseState.H1
+            } else {
+                state = ParseState.NONE
+            }
+            textCapture = null
+        }
+
+        void visitH2(Heading heading) {
+            String h1literal = null
+            textCapture = { String s -> h1literal = s }
+
+            switch (state) {
+                case ParseState.H1:
+                case ParseState.H2_CONTENT:
+                    state = ParseState.H2
+            }
+            visitChildren(heading)
+
+            switch (state) {
+                case ParseState.H2:
+                    state = ParseState.H2_CONTENT
+                    actionTitle(h1literal)
+            }
+            textCapture = null
+        }
 
         @Override
         void visit(Heading heading) {
-            String h1literal = null
-
-            if (heading.level == 1 && !h1Context) {
-                reset()
-                if (h1search) {
-                    textCapture = { String s -> h1literal = s }
-                }
-                h1Context = true
-            } else if (heading.level == 2 && h1Context) {
-                pushAction()
-                h2Context = true
-                textCapture = { String s -> actionTitle(s) }
-            } else if (h2Context) {
-                pushAction()
-                reset()
+            pushAction()
+            if (heading.level == 1) {
+                visitH1(heading)
+            } else if (heading.level == 2) {
+                visitH2(heading)
+            } else {
+                visitChildren(heading)
             }
-            visitChildren(heading)
-            if (heading.level == 1 && h1search && h1literal) {
-
-                def matcher = h1search.matcher(h1literal)
-                if (!matcher.matches()) {
-                    reset()
-                }
-            } else if (heading.level == 1 && h1search && !h1literal) {
-                reset()
-            }
-            textCapture = null
         }
 
         @Override
@@ -95,7 +118,7 @@ class MarkdownDetector implements Detector {
         void visit(Text text) {
             if (textCapture) {
                 textCapture.accept(text.literal)
-            } else if (h2Context) {
+            } else if (state == ParseState.H2_CONTENT) {
                 addDescription(text.literal + "\n")
             }
             super.visit(text)
@@ -103,7 +126,7 @@ class MarkdownDetector implements Detector {
 
         @Override
         void visit(FencedCodeBlock fencedCodeBlock) {
-            if (h2Context) {
+            if (state == ParseState.H2_CONTENT) {
                 actionInvocation(fencedCodeBlock.literal)
             }
             visitChildren(fencedCodeBlock)
@@ -111,7 +134,7 @@ class MarkdownDetector implements Detector {
 
         @Override
         void visit(IndentedCodeBlock indentedCodeBlock) {
-            if (h2Context) {
+            if (state == ParseState.H2_CONTENT) {
                 actionInvocation(indentedCodeBlock.literal)
             }
             visitChildren(indentedCodeBlock)
@@ -119,46 +142,46 @@ class MarkdownDetector implements Detector {
 
         @Override
         void visit(Code code) {
-            if (h2Context) {
+            if (state == ParseState.H2_CONTENT) {
                 actionInvocation(code.literal)
             }
             visitChildren(code)
         }
 
         private void pushAction() {
-            if (state.invocationString && state.name) {
-                actions.add(state)
+            if (state == ParseState.H2_CONTENT) {
+                if ((action.invocationString || action.description) && action.name) {
+                    actions.add(action)
+                }
+                state == ParseState.H1
             }
-            state = new CommandAction(type: 'markdown')
+            action = new CommandAction(type: 'markdown')
         }
 
         void finish() {
-            if (h2Context) {
-                pushAction()
-            }
+            pushAction()
         }
 
         private void reset() {
-            h1Context = false
-            h2Context = false
-            state = new CommandAction(type: 'markdown')
+            state = ParseState.NONE
+            action = new CommandAction(type: 'markdown')
         }
 
         void actionInvocation(String string) {
-            state.invocationString = string
+            action.invocationString = string
         }
 
         void addDescription(String string) {
-            if (state.description) {
-                state.description += string
+            if (action.description) {
+                action.description += string
             } else {
-                state.description = string
+                action.description = string
             }
         }
 
         void actionTitle(String string) {
-            state.title = string
-            state.name = string.toLowerCase().replaceAll('\\s+', '-')
+            action.title = string
+            action.name = string.toLowerCase().replaceAll('\\s+', '-')
         }
     }
 
@@ -168,9 +191,10 @@ class MarkdownDetector implements Detector {
         File file = findMdFile(howto.baseDir, HOWTO_FILE_NAMES)
         if (!file) {
             //look for Howto section in readme
+            h1search = HOWTO_H1_PATTERN
             file = findMdFile(howto.baseDir, README_FILE_NAMES)
-            if (file) {
-                h1search = HOWTO_H1_PATTERN
+            if (!file) {
+                return []
             }
         }
         parseActions(file, h1search)
