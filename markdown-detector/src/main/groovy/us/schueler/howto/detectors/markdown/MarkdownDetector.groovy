@@ -2,13 +2,7 @@ package us.schueler.howto.detectors.markdown
 
 import groovy.transform.CompileStatic
 import org.commonmark.ext.autolink.AutolinkExtension
-import org.commonmark.node.AbstractVisitor
-import org.commonmark.node.Code
-import org.commonmark.node.FencedCodeBlock
-import org.commonmark.node.Heading
-import org.commonmark.node.IndentedCodeBlock
-import org.commonmark.node.Node
-import org.commonmark.node.Text
+import org.commonmark.node.*
 import org.commonmark.parser.Parser
 import us.schueler.howto.Howto
 import us.schueler.howto.detectors.CommandAction
@@ -16,13 +10,14 @@ import us.schueler.howto.detectors.Detector
 import us.schueler.howto.model.DiscoveredAction
 
 import java.util.function.Consumer
-
+import java.util.regex.Pattern
 /**
  * Detects "howto.md" or "howto.markdown" file,
  * parses out H2 sections to define howto actions
  */
 @CompileStatic
 class MarkdownDetector implements Detector {
+    public static final Pattern HOWTO_H1_PATTERN = Pattern.compile(/(?i)(.+)?how[ -]?to(\W.+)?/)
     final String name = 'howto'
 
     private static Parser getParser() {
@@ -30,13 +25,19 @@ class MarkdownDetector implements Detector {
                 .extensions(Collections.singletonList(AutolinkExtension.create()))
                 .build();
     }
-    static List<String> PATTERNS = [
+    static List<String> HOWTO_FILE_NAMES = [
             'howto.md',
-            'howto.markdown'
+            'howto.markdown',
+            'howto'
+    ]
+    static List<String> README_FILE_NAMES = [
+            'readme.md',
+            'readme.markdown',
+            'readme'
     ]
 
-    static File findMdFile(File file) {
-        for (String pat : PATTERNS) {
+    static File findMdFile(File file, List<String> patterns) {
+        for (String pat : patterns) {
             def found = file.listFiles({ File d, String s -> s.equalsIgnoreCase(pat) } as FilenameFilter)
             if (found.length == 1) {
                 return found[0]
@@ -49,15 +50,20 @@ class MarkdownDetector implements Detector {
     static class DocVisitor extends AbstractVisitor {
         List<DiscoveredAction> actions = []
         CommandAction state = new CommandAction(type: 'markdown')
+        Pattern h1search = null
         boolean h1Context = false
         boolean h2Context = false
-        StringBuffer sb = new StringBuffer()
         Consumer<String> textCapture = null
 
         @Override
         void visit(Heading heading) {
+            String h1literal = null
+
             if (heading.level == 1 && !h1Context) {
                 reset()
+                if (h1search) {
+                    textCapture = { String s -> h1literal = s }
+                }
                 h1Context = true
             } else if (heading.level == 2 && h1Context) {
                 pushAction()
@@ -68,9 +74,22 @@ class MarkdownDetector implements Detector {
                 reset()
             }
             visitChildren(heading)
+            if (heading.level == 1 && h1search && h1literal) {
+
+                def matcher = h1search.matcher(h1literal)
+                if (!matcher.matches()) {
+                    reset()
+                }
+            } else if (heading.level == 1 && h1search && !h1literal) {
+                reset()
+            }
             textCapture = null
         }
 
+        @Override
+        void visit(Paragraph paragraph) {
+            visitChildren(paragraph)
+        }
 
         @Override
         void visit(Text text) {
@@ -145,22 +164,35 @@ class MarkdownDetector implements Detector {
 
     @Override
     List<DiscoveredAction> getActions(Howto howto) {
-        List<DiscoveredAction> actions = new ArrayList<>()
-        File file = findMdFile(howto.baseDir)
+        Pattern h1search = null
+        File file = findMdFile(howto.baseDir, HOWTO_FILE_NAMES)
         if (!file) {
-            return []
-        }
-        try (InputStream is = new FileInputStream(file)) {
-            Node document = parser.parseReader(new InputStreamReader(is));
-            //find h1 nodes
-
-            def visitor = new DocVisitor()
-            document.accept(visitor)
-            visitor.finish()
-            if (visitor.actions) {
-                actions.addAll(visitor.actions)
+            //look for Howto section in readme
+            file = findMdFile(howto.baseDir, README_FILE_NAMES)
+            if (file) {
+                h1search = HOWTO_H1_PATTERN
             }
         }
+        parseActions(file, h1search)
+    }
+
+    static List<DiscoveredAction> parseActions(File file, Pattern h1search) {
+        List<DiscoveredAction> actions = new ArrayList<>()
+        try (InputStream is = new FileInputStream(file)) {
+            parseActions(is, h1search, actions)
+        }
         actions
+    }
+
+    static void parseActions(InputStream is, Pattern h1search, List<DiscoveredAction> actions) {
+        Node document = parser.parseReader(new InputStreamReader(is))
+
+        def visitor = new DocVisitor()
+        visitor.h1search = h1search
+        document.accept(visitor)
+        visitor.finish()
+        if (visitor.actions) {
+            actions.addAll(visitor.actions)
+        }
     }
 }
