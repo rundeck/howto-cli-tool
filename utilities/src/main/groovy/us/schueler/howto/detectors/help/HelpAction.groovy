@@ -5,6 +5,7 @@ import us.schueler.howto.Howto
 import us.schueler.howto.detectors.BaseAction
 import us.schueler.howto.detectors.Detector
 import picocli.CommandLine.Help.Ansi
+import us.schueler.howto.model.DiscoveredAction
 
 @CompileStatic
 class HelpAction extends BaseAction {
@@ -23,17 +24,16 @@ class HelpAction extends BaseAction {
         int count = 0
         List<String> tips = []
         Map<String, Map<String, String>> cmds = [:]
-        howto.detectors.each { Detector detector ->
-            detector.getActions(howto).each {
-                if (it.name == 'help' && it.type == 'help') {
-                    return
-                }
-                if (!args || it.name in args) {
-                    cmds.put(it.name, [description: it.description, invocationString: it.invocationString?.trim()])
-                    count++
-                }
+        howto.detectedActions.each { DiscoveredAction action ->
+            if (action.name == 'help' && action.type == 'help') {
+                return
+            }
+            if (!args || action.name in args) {
+                cmds.put(action.name, [description: action.description, invocationString: action.invocationString?.trim()])
+                count++
             }
         }
+
         if (args?.size() < 1) {
             println Ansi.AUTO.string("How To")
             println Ansi.AUTO.string("@|faint " + ("_" * 40) + " |@")
