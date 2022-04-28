@@ -51,7 +51,7 @@ class HelpAction extends BaseAction {
                 println Ansi.AUTO.string("@|white ${name}|@: \n")
                 println indentString('    ', data.description.trim())
             } else {
-                String named = name.size() < max ? (name + (" " * ((max+1) - name.size()))) : name
+                String named =  (name + (" " * ((max+1) - name.size())))
                 def shortDesc = data.description.split('[\n\r]', 2)[0]
                 println Ansi.AUTO.string("@|white ${named}|@: ${shortDesc}")
             }
