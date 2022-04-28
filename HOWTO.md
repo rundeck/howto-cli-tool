@@ -55,7 +55,9 @@ Test the project with Gradle
 
 ## Install
 
-Build and install locally with Gradle
+Build and install locally with Gradle.
+
+This installs within the app/build/install/how/bin directory.
 
     ./gradlew :app:installDist
 
@@ -64,6 +66,12 @@ Build and install locally with Gradle
 Run local installation
 
     ./app/build/install/how/bin/how "$@"
+
+## Release
+
+Release the project.
+
+    ./gradlew release
 
 ## Pond
 
