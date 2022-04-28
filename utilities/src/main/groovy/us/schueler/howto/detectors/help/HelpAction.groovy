@@ -37,8 +37,8 @@ class HelpAction extends BaseAction {
         if (args?.size() < 1) {
             println Ansi.AUTO.string("How To")
             println Ansi.AUTO.string("@|faint " + ("_" * 40) + " |@")
-            tips<<Ansi.AUTO.string("see more: @|green how to|@ @|white [action]|@ [args]")
-            tips<<Ansi.AUTO.string("do the action: @|green how do|@ @|white [action]|@ [args]")
+            tips << Ansi.AUTO.string("see more: @|green how to|@ @|white [action]|@ [args]")
+            tips << Ansi.AUTO.string("do the action: @|green how do|@ @|white [action]|@ [args]")
         } else {
             tips << Ansi.AUTO.string("do the thing with: @|green how do|@ @|white [action]|@ [args]")
             tips << Ansi.AUTO.string("or just: @|green how|@ @|white [action]|@ [args]")
@@ -50,16 +50,18 @@ class HelpAction extends BaseAction {
         cmds.each { String name, Map<String, String> data ->
             if (howto.verbose) {
                 println Ansi.AUTO.string("@|white ${name}|@: \n")
-                if(data.description){
+                if (data.description) {
                     println indentString('    ', data.description.trim())
+                    println ''
                 }
             } else {
-                String named =  (name + (" " * ((max+1) - name.size())))
-                def shortDesc = data.description?data.description.split('[\n\r]', 2)[0]:''
+                String named = (name + (" " * ((max + 1) - name.size())))
+                def shortDesc = data.description ? data.description.split('[\n\r]', 2)[0] : ''
                 println Ansi.AUTO.string("@|white ${named}|@: ${shortDesc}")
             }
             if (howto.verbose && data.invocationString) {
-                println '\n' + indentString('        ', data.invocationString) + '\n'
+                println Ansi.AUTO.string('@|magenta ' + indentString('    ', data.invocationString) + '|@')
+                println ''
             }
         }
         if (!howto.verbose) {
@@ -68,7 +70,7 @@ class HelpAction extends BaseAction {
 
         if (tips) {
             println Ansi.AUTO.string("@|faint " + ("_" * 40) + " |@")
-            tips.forEach(s -> println(Ansi.AUTO.string("@|cyan tip:|@ ")+s))
+            tips.forEach(s -> println(Ansi.AUTO.string("@|cyan tip:|@ ") + s))
         }
     }
 
