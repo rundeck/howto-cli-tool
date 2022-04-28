@@ -1,4 +1,4 @@
-package us.schueler.cando.utilities.detectors.markdown
+package us.schueler.howto.detectors.markdown
 
 import groovy.transform.CompileStatic
 import org.commonmark.ext.autolink.AutolinkExtension
@@ -10,20 +10,20 @@ import org.commonmark.node.IndentedCodeBlock
 import org.commonmark.node.Node
 import org.commonmark.node.Text
 import org.commonmark.parser.Parser
-import us.schueler.cando.utilities.Cando
-import us.schueler.cando.utilities.detectors.CommandAction
-import us.schueler.cando.utilities.detectors.Detector
-import us.schueler.cando.utilities.model.DiscoveredAction
+import us.schueler.howto.Howto
+import us.schueler.howto.detectors.CommandAction
+import us.schueler.howto.detectors.Detector
+import us.schueler.howto.model.DiscoveredAction
 
 import java.util.function.Consumer
 
 /**
- * Detects "cando.md" or "cando.markdown" file,
- * parses out H2 sections to define cando actions
+ * Detects "howto.md" or "howto.markdown" file,
+ * parses out H2 sections to define howto actions
  */
 @CompileStatic
 class MarkdownDetector implements Detector {
-    final String name = 'cando'
+    final String name = 'howto'
 
     private static Parser getParser() {
         return Parser.builder()
@@ -31,11 +31,11 @@ class MarkdownDetector implements Detector {
                 .build();
     }
     static List<String> PATTERNS = [
-            'cando.md',
-            'cando.markdown'
+            'howto.md',
+            'howto.markdown'
     ]
 
-    static File findCandoFile(File file) {
+    static File findMdFile(File file) {
         for (String pat : PATTERNS) {
             def found = file.listFiles({ File d, String s -> s.equalsIgnoreCase(pat) } as FilenameFilter)
             if (found.length == 1) {
@@ -144,13 +144,13 @@ class MarkdownDetector implements Detector {
     }
 
     @Override
-    List<DiscoveredAction> getActions(Cando cando) {
+    List<DiscoveredAction> getActions(Howto howto) {
         List<DiscoveredAction> actions = new ArrayList<>()
-        File candoFile = findCandoFile(cando.baseDir)
-        if (!candoFile) {
+        File file = findMdFile(howto.baseDir)
+        if (!file) {
             return []
         }
-        try (InputStream is = new FileInputStream(candoFile)) {
+        try (InputStream is = new FileInputStream(file)) {
             Node document = parser.parseReader(new InputStreamReader(is));
             //find h1 nodes
 

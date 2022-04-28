@@ -1,10 +1,9 @@
-package us.schueler.cando.utilities.detectors
+package us.schueler.howto.detectors
 
 import groovy.transform.CompileStatic
-import us.schueler.cando.utilities.model.DiscoveredAction
 
 @CompileStatic
-abstract class BaseAction implements DiscoveredAction {
+abstract class BaseAction implements us.schueler.howto.model.DiscoveredAction {
     String type
     String name
     String title

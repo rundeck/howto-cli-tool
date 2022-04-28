@@ -1,9 +1,9 @@
-package us.schueler.cando.app
+package us.schueler.howto.app
 
 import groovy.transform.CompileStatic
 import picocli.CommandLine
 
-import static us.schueler.cando.Version.VERSION
+import static us.schueler.howto.Version.VERSION
 
 @CompileStatic
 class VersionProvider implements CommandLine.IVersionProvider {

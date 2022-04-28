@@ -1,8 +1,8 @@
-package us.schueler.cando.utilities.model
+package us.schueler.howto.model
 
 /**
  * Defines structure
  */
-interface CandoModel {
+interface HowtoModel {
     List<DiscoveredAction> listActions()
 }

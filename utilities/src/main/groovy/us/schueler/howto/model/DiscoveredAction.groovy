@@ -1,6 +1,6 @@
-package us.schueler.cando.utilities.model
+package us.schueler.howto.model
 
-import us.schueler.cando.utilities.Cando
+import us.schueler.howto.Howto
 
 interface DiscoveredAction {
     /**
@@ -38,5 +38,5 @@ interface DiscoveredAction {
      * Invoke the action
      * @param args
      */
-    void invoke(Cando cando, List<String> args)
+    void invoke(Howto howto, List<String> args)
 }

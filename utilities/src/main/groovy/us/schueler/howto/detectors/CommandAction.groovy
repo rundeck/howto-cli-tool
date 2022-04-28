@@ -1,22 +1,22 @@
-package us.schueler.cando.utilities.detectors
+package us.schueler.howto.detectors
 
 import groovy.transform.CompileStatic
-import us.schueler.cando.utilities.Cando
+import us.schueler.howto.Howto
 
 @CompileStatic
 class CommandAction extends BaseAction {
     @Override
-    void invoke(Cando cando, List<String> args) {
+    void invoke(Howto howto, List<String> args) {
         def invocation = getInvocation(args)
         if (!invocation) {
             println "TODO: unable to automatically execute the action on this OS, sorry!"
             println "You should execution manually:\n\n" +
                     "${invocationString}"
-        } else if (cando.verbose) {
-            println "cando: running: ${invocation}"
+        } else if (howto.verbose) {
+            println "how: running: ${invocation}"
         }
         def Process proc = new ProcessBuilder(invocation).
-                directory(cando.baseDir).
+                directory(howto.baseDir).
                 inheritIO().
                 start()
         int result = proc.waitFor()

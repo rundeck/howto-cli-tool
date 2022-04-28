@@ -21,9 +21,9 @@ dependencies {
 
 buildConfig {
     className "Version"
-    packageName 'us.schueler.cando'
+    packageName 'us.schueler.howto'
 
-    buildConfigField('String', 'NAME', "\"cando\"")
+    buildConfigField('String', 'NAME', "\"${rootProject.name}\"")
     buildConfigField('String', 'VERSION', "\"${project.version}\"")
     buildConfigField('String', 'BUILD_DATE', "\"${new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX").format(new Date())}\"")
 }

@@ -1,12 +1,12 @@
-package us.schueler.cando.detectors.npm
+package us.schueler.howto.detectors.npm
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import groovy.transform.CompileStatic
-import us.schueler.cando.utilities.Cando
-import us.schueler.cando.utilities.detectors.CommandAction
-import us.schueler.cando.utilities.detectors.Detector
-import us.schueler.cando.utilities.model.DiscoveredAction
+import us.schueler.howto.Howto
+import us.schueler.howto.detectors.CommandAction
+import us.schueler.howto.detectors.Detector
+import us.schueler.howto.model.DiscoveredAction
 
 /**
  * Detect NPM script definitions in package.json
@@ -22,8 +22,8 @@ class NpmDetector implements Detector {
     }
 
     @Override
-    List<DiscoveredAction> getActions(Cando cando) {
-        File jsonFile = new File(cando.baseDir, "package.json")
+    List<DiscoveredAction> getActions(Howto howto) {
+        File jsonFile = new File(howto.baseDir, "package.json")
         if (!jsonFile.exists()) {
             return []
         }

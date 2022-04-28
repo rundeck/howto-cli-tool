@@ -18,8 +18,8 @@ repositories {
 
 application {
     // Define the main class for the application.
-    mainClass = 'us.schueler.cando.app.App'
-    applicationName = 'cando'
+    mainClass = 'us.schueler.howto.app.App'
+    applicationName = 'how'
 }
 
 repositories {

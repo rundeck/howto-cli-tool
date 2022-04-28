@@ -1,26 +1,26 @@
-package us.schueler.cando.utilities
+package us.schueler.howto
 
 import groovy.transform.CompileStatic
-import us.schueler.cando.utilities.detectors.Detector
-import us.schueler.cando.utilities.model.DiscoveredAction
+import us.schueler.howto.detectors.Detector
+import us.schueler.howto.model.DiscoveredAction
 
 @CompileStatic
-class Cando {
+class Howto {
     File baseDir
     List<Detector> detectors = []
     boolean verbose
 
-    Cando(File baseDir) {
+    Howto(File baseDir) {
         this.baseDir = baseDir
     }
     static ServiceLoader<Detector> detectorLoader = ServiceLoader.load(Detector)
 
-    static Cando create(File file) {
-        Cando cando = new Cando(file)
+    static Howto create(File file) {
+        Howto howto = new Howto(file)
         for (Detector detector : detectorLoader) {
-            cando.detectors.add detector
+            howto.detectors.add detector
         }
-        cando
+        howto
     }
 
     List<Detector> detect() {
@@ -30,7 +30,7 @@ class Cando {
     void invoke(String name, List<String> args) {
         DiscoveredAction action = findAction(name)
         if (!action) {
-            println "Action not found $name. Try: cando help"
+            println "Action not found $name. Try: how help"
             return
         }
         action.invoke(this, args)
