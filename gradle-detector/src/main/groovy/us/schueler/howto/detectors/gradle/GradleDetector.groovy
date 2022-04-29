@@ -55,7 +55,7 @@ class GradleDetector implements Detector {
         def builder = new ProcessBuilder(command).directory(baseDir)
         def Process proc = builder.start()
         StringBuffer out = new StringBuffer()
-        proc.waitForProcessOutput(out, System.err)
+        proc.waitForProcessOutput(out, null)
         int ret = proc.waitFor()
         if (ret == 0) {
             return out.toString()
