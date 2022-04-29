@@ -15,36 +15,47 @@ class GradleDetector implements Detector {
 
     @Override
     List<DiscoveredAction> getActions(Howto howto) {
-        if (!hasGradle(howto.baseDir)) {
+        File gradleBase = findGradleBase(howto.baseDir)
+        if (!gradleBase) {
             return []
         }
-        Map<String, String> gradleActions = listGradleActions(howto.baseDir)
+        Map<String, String> gradleActions = listGradleActions(gradleBase, howto.baseDir.absoluteFile)
         List<DiscoveredAction> actions = new ArrayList<>()
+        def strings = getActionStrings(gradleBase, howto.baseDir.absoluteFile)
         gradleActions.each {
             actions << new CommandAction(
                     type: 'gradle',
                     name: it.key,
                     description: it.value,
-                    invocationString: "./gradlew ${it.key}"
+                    invocationString: (strings + [it.key]).join(' ')
             )
         }
         actions
     }
 
-    Map<String, String> listGradleActions(File baseDir) {
-        def gradlew = new File(baseDir, 'gradlew')
-        if (gradlew.exists()) {
-            String output = captureOutput(baseDir, ['./gradlew', 'tasks'])
-            return parseOutputTasks(output)
+    Map<String, String> listGradleActions(File gradleBaseDir, File projDir) {
+        def gradlew = new File(gradleBaseDir, 'gradlew')
+        if (!gradlew.exists()) {
+            return [:]
         }
-        [:]
+        List<String> actionStrings = getActionStrings(gradleBaseDir, projDir)
+        String output = captureOutput(projDir, actionStrings + ['tasks'])
+        return parseOutputTasks(output)
+    }
+
+    private List<String> getActionStrings(File gradleBaseDir, File projDir) {
+        String gradlew = './gradlew'
+        if (projDir != gradleBaseDir) {
+            gradlew = projDir.toPath().relativize(new File(gradleBaseDir, 'gradlew').toPath()).toString()
+        }
+        [gradlew]
     }
 
     String captureOutput(File baseDir, List<String> command) {
         def builder = new ProcessBuilder(command).directory(baseDir)
         def Process proc = builder.start()
         StringBuffer out = new StringBuffer()
-        proc.waitForProcessOutput(out, null)
+        proc.waitForProcessOutput(out, System.err)
         int ret = proc.waitFor()
         if (ret == 0) {
             return out.toString()
@@ -52,8 +63,22 @@ class GradleDetector implements Detector {
         return null
     }
 
-    boolean hasGradle(File baseDir) {
-        return new File(baseDir, 'settings.gradle').exists()
+    File findGradleBase(File baseDir) {
+        File dir = baseDir.getAbsoluteFile()
+        int count = 0
+
+        while (count < 10 && dir) {
+            if (new File(dir, 'settings.gradle').exists()) {
+                break
+            }
+            dir = dir.parentFile
+
+            count++
+        }
+        if (dir && new File(dir, 'settings.gradle').exists()) {
+            return dir
+        }
+        return null
     }
 
     static Pattern TASK_PATTERN = Pattern.compile(/^(\w+) - (.+)$/)
