@@ -46,7 +46,7 @@ class App {
             @CommandLine.Parameters(paramLabel = 'action') String action,
             @CommandLine.Parameters(paramLabel = 'args', description = "args passed to the action") List<String> args
     ) {
-        Howto howto = Howto.create(baseDir ?: new File("."))
+        Howto howto = Howto.create(baseDir ?: new File("").absoluteFile)
         howto.verbose = verbose
         howto.all = all
 
