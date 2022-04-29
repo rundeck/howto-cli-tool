@@ -24,9 +24,13 @@ class Howto {
         new Howto(file)
     }
 
+    List<DiscoveredAction> getDetectedActions() {
+        return getDetectedActions(this.all)
+    }
+
     //cache results
     @Memoized
-    List<DiscoveredAction> getDetectedActions() {
+    List<DiscoveredAction> getDetectedActions(boolean all) {
         List<DiscoveredAction> detectedActions = []
         detectedActions.addAll(new HelpDetector().getActions(this))
         def mdactions = new MarkdownDetector().getActions(this)

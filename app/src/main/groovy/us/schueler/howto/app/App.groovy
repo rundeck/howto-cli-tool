@@ -48,9 +48,17 @@ class App {
     ) {
         Howto howto = Howto.create(baseDir ?: new File("."))
         howto.verbose = verbose
-        howto.all = all || action != 'help'
+        howto.all = all
 
         def val = howto.invoke(action, args)
+        if (val < 0) {
+            //find all actions
+            if (!all) {
+                howto.verbose = true
+                howto.all = true
+                val = howto.invoke(action, args)
+            }
+        }
         if (val < 0) {
             println "Action not found: $action"
             return 1
