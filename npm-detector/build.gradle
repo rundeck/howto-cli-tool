@@ -2,9 +2,6 @@ plugins {
     id 'groovy'
 }
 
-group 'org.example'
-version 'unspecified'
-
 repositories {
     mavenCentral()
 }

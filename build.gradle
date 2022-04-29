@@ -5,4 +5,5 @@ plugins {
 
 allprojects {
     project.version = scmVersion.version
+    project.group = 'us.schueler.howto'
 }
