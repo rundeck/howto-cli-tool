@@ -48,7 +48,7 @@ class App {
     ) {
         Howto howto = Howto.create(baseDir ?: new File("."))
         howto.verbose = verbose
-        howto.all = all
+        howto.all = all || action != 'help'
 
         def val = howto.invoke(action, args)
         if (val < 0) {
