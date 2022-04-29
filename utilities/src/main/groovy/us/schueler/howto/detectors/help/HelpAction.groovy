@@ -29,7 +29,7 @@ class HelpAction extends BaseAction {
                 return
             }
             if (!args || action.name in args) {
-                cmds.put(action.name, [description: action.description, invocationString: action.invocationString?.trim()])
+                cmds.put(action.name, [description: action.description, invocationString: action.invocationString?.trim(), type: action.type])
                 count++
             }
         }
@@ -57,6 +57,9 @@ class HelpAction extends BaseAction {
             } else {
                 String named = (name + (" " * ((max + 1) - name.size())))
                 def shortDesc = data.description ? data.description.split('[\n\r]', 2)[0] : ''
+                if (howto.all) {
+                    shortDesc = "[${data.type}] " + shortDesc
+                }
                 println Ansi.AUTO.string("@|white ${named}|@: ${shortDesc}")
             }
             if (howto.verbose && data.invocationString) {

@@ -32,20 +32,23 @@ class App {
     int help(
             @CommandLine.Option(names = ['-d', '--dir'], description = 'Base dir') File baseDir,
             @CommandLine.Option(names = ['-v', '--verbose'], description = 'Verbose') boolean verbose,
+            @CommandLine.Option(names = ['-a', '--all'], description = 'All') boolean all,
             @CommandLine.Parameters(paramLabel = 'args', description = "args passed to the action") List<String> args
     ) {
-        run(baseDir, args?.size() > 0 || verbose, 'help', args)
+        run(baseDir, args?.size() > 0 || verbose, all, 'help', args)
     }
 
     @CommandLine.Command(name = 'run', aliases = ['do'], description = 'Run an action')
     int run(
             @CommandLine.Option(names = ['-d', '--dir'], description = 'Base dir') File baseDir,
             @CommandLine.Option(names = ['-v', '--verbose'], description = 'Verbose') boolean verbose,
+            @CommandLine.Option(names = ['-a', '--all'], description = 'All') boolean all,
             @CommandLine.Parameters(paramLabel = 'action') String action,
             @CommandLine.Parameters(paramLabel = 'args', description = "args passed to the action") List<String> args
     ) {
         Howto howto = Howto.create(baseDir ?: new File("."))
         howto.verbose = verbose
+        howto.all = all
 
         def val = howto.invoke(action, args)
         if (val < 0) {
