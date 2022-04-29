@@ -30,6 +30,7 @@ repositories {
 dependencies {
     implementation project(':utilities')
     implementation project(':npm-detector')
+    implementation project(':gradle-detector')
     // Use the latest Groovy version for building this library
     implementation 'org.codehaus.groovy:groovy-all:3.0.10'
 

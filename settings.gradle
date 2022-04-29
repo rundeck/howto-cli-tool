@@ -10,4 +10,5 @@
 rootProject.name = 'howto'
 include('app', 'utilities')
 include 'npm-detector'
+include 'gradle-detector'
 
