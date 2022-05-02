@@ -33,7 +33,7 @@ class HelpAction extends BaseAction {
         if (args?.size() < 1) {
             println Ansi.AUTO.string("Found Actions:")
             println Ansi.AUTO.string("@|faint " + ("_" * 40) + " |@")
-            tips << Ansi.AUTO.string("see more: @|green how to|@ @|white [action]|@ [args]")
+            tips << Ansi.AUTO.string("see more: @|green how to|@ @|white [action]|@")
             tips << Ansi.AUTO.string("do the action: @|green how do|@ @|white [action]|@ [args]")
         } else {
             tips << Ansi.AUTO.string("do the thing with: @|green how do|@ @|white [action]|@ [args]")

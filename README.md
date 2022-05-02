@@ -15,7 +15,7 @@ local   : Run local installation
 release : Release the project.
 pond    : Toss a coin in the pond!
 ________________________________________ 
-tip: see more: how to [action] [args]
+tip: see more: how to [action]
 tip: do the action: how do [action] [args]
 tip: use how to -v for more information
 
