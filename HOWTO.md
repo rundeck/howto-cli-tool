@@ -14,6 +14,12 @@ Build the project with Gradle
 
     ./gradlew build
 
+## Build Native
+
+Build native binary with graal
+
+    ./gradlew :app:nativeImage
+
 ## Test
 
 Test the project with Gradle
