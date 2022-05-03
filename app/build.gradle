@@ -18,6 +18,7 @@ graal {
     outputName 'how'
     option '--no-fallback'
     option '--allow-incomplete-classpath'
+    javaVersion('11')
 }
 repositories {
     // Use Maven Central for resolving dependencies.
