@@ -59,12 +59,15 @@ generateTestBuildConfig - Generates the build constants class for 'test' source
     }
 
     def "parse gradle tasks output"() {
+        given:
 
+        def reader = new GradleDetector.LineReader()
         when:
-        def output = GradleDetector.parseOutputTasks(GRADLE_OUT_1)
+
+        GRADLE_OUT_1.readLines().each { reader.accept(it) }
         then:
 
-        output == expected
+        reader.found == expected
 
         where:
         expected = [
