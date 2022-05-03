@@ -8,8 +8,17 @@ plugins {
 
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
+
+    id 'com.palantir.graal' version '0.10.0'
 }
 
+apply plugin: 'com.palantir.graal'
+graal {
+    mainClass 'us.schueler.howto.app.App'
+    outputName 'how'
+    option '--no-fallback'
+    option '--allow-incomplete-classpath'
+}
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
@@ -31,8 +40,6 @@ dependencies {
     implementation project(':utilities')
     implementation project(':npm-detector')
     implementation project(':gradle-detector')
-    // Use the latest Groovy version for building this library
-    implementation 'org.codehaus.groovy:groovy-all:3.0.10'
 
     implementation 'info.picocli:picocli:4.6.3'
     annotationProcessor 'info.picocli:picocli-codegen:4.6.3'
@@ -41,6 +48,8 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.36'
     implementation 'org.slf4j:slf4j-simple:1.7.36'
 
+    // Use the latest Groovy version for building this library
+    testImplementation 'org.codehaus.groovy:groovy-all:3.0.10'
     // Use the awesome Spock testing and specification framework even with Java
     testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
     testImplementation 'junit:junit:4.13.2'
