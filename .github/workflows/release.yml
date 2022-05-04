@@ -36,6 +36,6 @@ jobs:
           files: |
             app/build/distributions/how-*.zip
             app/build/distributions/how-*.tar
-            app/build/graal/how
+            app/build/nativeDist/how-native-*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
