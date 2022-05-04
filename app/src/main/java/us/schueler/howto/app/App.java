@@ -26,15 +26,24 @@ public class App {
     }
 
     @CommandLine.Command(name = "help", aliases = {"list", "ls", "to"}, description = "List available actions")
-    public int help(@CommandLine.Option(names = {"-d", "--dir"}, description = "Base dir") File baseDir, @CommandLine.Option(names = {"-v", "--verbose"}, description = "Verbose") boolean verbose, @CommandLine.Option(names = {"-a", "--all"}, description = "All") boolean all, @CommandLine.Parameters(paramLabel = "args", description = "args passed to the action") List<String> args) {
-        return run(baseDir, args!=null && args.size() > 0 || verbose, all, "help", args);
+    public int help(@CommandLine.Option(names = {"-d", "--dir"}, description = "Base dir") File baseDir,
+                    @CommandLine.Option(names = {"-v", "--verbose"}, description = "Verbose") boolean verbose,
+                    @CommandLine.Option(names = {"-a", "--all"}, description = "All") boolean all,
+                    @CommandLine.Option(names = {"--debug"}, description = "Debug") boolean debug,
+                    @CommandLine.Parameters(paramLabel = "args", description = "args passed to the action") List<String> args) {
+        return run(baseDir, args != null && args.size() > 0 || verbose, all, debug, "help", args);
     }
 
     @CommandLine.Command(name = "run", aliases = {"do"}, description = "Run an action")
-    public int run(@CommandLine.Option(names = {"-d", "--dir"}, description = "Base dir") File baseDir, @CommandLine.Option(names = {"-v", "--verbose"}, description = "Verbose") boolean verbose, @CommandLine.Option(names = {"-a", "--all"}, description = "All") boolean all, @CommandLine.Parameters(paramLabel = "action") String action, @CommandLine.Parameters(paramLabel = "args", description = "args passed to the action") List<String> args) {
+    public int run(@CommandLine.Option(names = {"-d", "--dir"}, description = "Base dir") File baseDir,
+                   @CommandLine.Option(names = {"-v", "--verbose"}, description = "Verbose") boolean verbose,
+                   @CommandLine.Option(names = {"-a", "--all"}, description = "All") boolean all,
+                   @CommandLine.Option(names = {"--debug"}, description = "Debug") boolean debug,
+                   @CommandLine.Parameters(paramLabel = "action") String action, @CommandLine.Parameters(paramLabel = "args", description = "args passed to the action") List<String> args) {
         Howto howto = Howto.create(baseDir != null ? baseDir : new File("").getAbsoluteFile());
         howto.setVerbose(verbose);
         howto.setAll(all);
+        howto.setDebug(debug);
 
         int val = howto.invoke(action, args);
         if (val < 0) {
@@ -52,7 +61,7 @@ public class App {
             return 1;
         }
 
-        return ((int) (val));
+        return val;
     }
 
 }

@@ -9,12 +9,13 @@ public interface HowtoApp {
     boolean isVerbose();
 
     boolean isAll();
+    boolean isDebug();
 
     File getBaseDir();
 
-    public int invoke(final String name, List<String> args);
+    int invoke(final String name, List<String> args);
 
     List<DiscoveredAction> getDetectedActions();
 
-    public List<DiscoveredAction> getDetectedActions(boolean all);
+    List<DiscoveredAction> getDetectedActions(boolean all);
 }

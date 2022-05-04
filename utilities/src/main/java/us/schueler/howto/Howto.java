@@ -16,6 +16,7 @@ public class Howto implements HowtoApp {
     private final File baseDir;
     private boolean verbose;
     private boolean all;
+    private boolean debug;
 
     public Howto(File baseDir) {
         this.baseDir = baseDir;
@@ -47,6 +48,9 @@ public class Howto implements HowtoApp {
 
         if (mdactions == null || mdactions.size() < 1 || all) {
             for (Detector detector : getDetectors()) {
+                if (isDebug()) {
+                    System.err.println("Loaded detector: " + detector.getName());
+                }
                 detectedActions.addAll(detector.getActions(this));
             }
 
@@ -84,10 +88,6 @@ public class Howto implements HowtoApp {
     }
 
 
-    public boolean getVerbose() {
-        return verbose;
-    }
-
     public boolean isVerbose() {
         return verbose;
     }
@@ -106,6 +106,14 @@ public class Howto implements HowtoApp {
 
     public void setAll(boolean all) {
         this.all = all;
+    }
+
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
     }
 
 }
