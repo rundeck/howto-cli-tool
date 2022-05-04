@@ -41,9 +41,9 @@ jobs:
         arguments: :app:nativeImage
     - uses: actions/upload-artifact@v3
       with:
-        name: Package
+        name: JavaDist
         path: app/build/distributions
     - uses: actions/upload-artifact@v3
       with:
-        name: Package
+        name: NativeBuild
         path: app/build/graal
