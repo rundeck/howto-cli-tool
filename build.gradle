@@ -7,3 +7,8 @@ allprojects {
     project.version = scmVersion.version
     project.group = 'us.schueler.howto'
 }
+
+subprojects {
+    apply plugin: 'base'
+    archivesBaseName = "how-${it.name}"
+}
