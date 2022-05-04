@@ -47,7 +47,7 @@ public class CommandAction extends BaseAction {
     }
 
     private List<String> getBashInvocation(List<String> args) {
-        List<String> bash = Arrays.asList("bash", "-c", getInvocationString().trim());
+        List<String> bash = new ArrayList<>(Arrays.asList("bash", "-c", getInvocationString().trim()));
         if (args != null && args.size() > 0) {
             bash.add("--");
             bash.addAll(args);
