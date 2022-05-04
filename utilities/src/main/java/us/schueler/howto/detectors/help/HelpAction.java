@@ -60,7 +60,7 @@ public class HelpAction extends BaseAction {
                 System.out.println(CommandLine.Help.Ansi.AUTO.string("@|white " + name + "|@: \n"));
                 if (description != null) {
                     System.out.println(indentString("    ", description.trim()));
-                    System.out.println("");
+                    System.out.println();
                 }
             } else {
                 final String named = (name + (repeatString(" ", (max > 0 ? ((max + 1) - name.length()) : 2))));
@@ -75,7 +75,7 @@ public class HelpAction extends BaseAction {
 
             if (howto.isVerbose() && data.getInvocationString() != null) {
                 System.out.println(CommandLine.Help.Ansi.AUTO.string("@|magenta " + indentString("    ", data.getInvocationString() + "|@")));
-                System.out.println("");
+                System.out.println();
             }
 
         });
@@ -118,7 +118,7 @@ public class HelpAction extends BaseAction {
         return cmds;
     }
 
-    private String indentString(String indent, String string) {
+    private String indentString(@SuppressWarnings("SameParameterValue") String indent, String string) {
         return indent + string.replaceAll("\n", "\n" + indent);
     }
 
