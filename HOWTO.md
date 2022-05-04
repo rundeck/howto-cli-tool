@@ -16,9 +16,13 @@ Build the project with Gradle
 
 ## Build Native
 
-Build native binary with graal
+Build native binary with graalvm.
 
-    ./gradlew :app:nativeImage
+Result binary in app/build/graal/how-$VERSION
+
+Result dist zip in app/build/nativeDist
+
+    ./gradlew :app:nativeDistZip
 
 ## Test
 

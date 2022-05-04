@@ -75,6 +75,8 @@ task copyNative(type: Copy) {
     }
 }
 task nativeDistZip(type: Zip) {
+    group('Distribution')
+    description('Build native image and package it into a zip file')
     dependsOn copyNative
     outputs.file("${buildDir}/nativeDist/how-native-${project.version}.zip")
     doFirst {
