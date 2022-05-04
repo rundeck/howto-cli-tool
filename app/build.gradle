@@ -15,7 +15,7 @@ plugins {
 apply plugin: 'com.palantir.graal'
 graal {
     mainClass 'us.schueler.howto.app.App'
-    outputName 'how'
+    outputName "how-${project.version}"
     option '--no-fallback'
     option '--allow-incomplete-classpath'
     javaVersion('11')
@@ -58,4 +58,36 @@ compileJava {
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+configurations {
+    nativeDist
+    nativeBuild
+}
+task copyNative(type: Copy) {
+    dependsOn nativeImage
+    inputs.file("${buildDir}/graal/how-${project.version}")
+    outputs.file("${buildDir}/nativeDist/content/bin/how")
+    from "${buildDir}/graal/how-${project.version}"
+    into "${buildDir}/nativeDist/content/bin"
+
+    rename { filename ->
+        "how"
+    }
+    doFirst {
+        file("${buildDir}/nativeDist/content/bin").mkdirs()
+    }
+}
+task nativeDistZip(type: Zip) {
+    dependsOn copyNative
+    outputs.file("${buildDir}/nativeDist/how-native-${project.version}.zip")
+    doFirst {
+        file("${buildDir}/nativeDist/content").mkdirs()
+    }
+    from "${buildDir}/nativeDist/content"
+    destinationDirectory = file("${buildDir}/nativeDist")
+    archiveFileName = "how-native-${project.version}.zip"
+}
+artifacts {
+    add('archives', nativeDistZip)
+    nativeBuild file:file("${buildDir}/graal/how-${project.version}"), builtBy: nativeImage
 }
