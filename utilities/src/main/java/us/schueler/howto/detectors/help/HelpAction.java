@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class HelpAction extends BaseAction {
 
@@ -19,12 +20,12 @@ public class HelpAction extends BaseAction {
 
     private void printPlain(final HowtoApp howto, List<String> args) {
 
-        List<String> tips = new ArrayList<String>();
-        Map<String, DiscoveredAction> cmds = collectActions(howto, howto.isAll(), args);
+        List<String> tips = new ArrayList<>();
+        Map<String, DiscoveredAction> cmds = collectActionsAllOrEqual(howto, howto.isAll(), args);
 
         if (cmds.size() < 1 && args != null && args.size() > 0 && !howto.isAll()) {
             //retry using all detectors
-            cmds = collectActions(howto, true, args);
+            cmds = collectActionsAllOrEqual(howto, true, args);
         }
 
 
@@ -40,6 +41,16 @@ public class HelpAction extends BaseAction {
 
         if (cmds.size() < 1) {
             System.out.println(CommandLine.Help.Ansi.AUTO.string("@|faint No actions were found.|@"));
+            if (args != null && args.size() == 1) {
+                //find similar
+                String test = args.get(0);
+                Map<String, DiscoveredAction> similar = collectActionsMatching(howto, true, (action) -> action.getName().contains(test));
+                if(!similar.isEmpty()){
+                    System.out.println(CommandLine.Help.Ansi.AUTO.string("@|faint Did you mean?|@"));
+                    similar.forEach((n,a)-> System.out.println(CommandLine.Help.Ansi.AUTO.string("@|faint - "+n+"|@")));
+
+                }
+            }
         }
 
         final int max = cmds.keySet().stream().map(String::length).max(Integer::compareTo).orElse(-1);
@@ -88,14 +99,18 @@ public class HelpAction extends BaseAction {
         return sb.toString();
     }
 
-    private Map<String, DiscoveredAction> collectActions(HowtoApp howto, boolean all, final List<String> args) {
+    private Map<String, DiscoveredAction> collectActionsAllOrEqual(HowtoApp howto, boolean all, final List<String> args) {
+        return collectActionsMatching(howto, all, (action) -> args == null || args.size() == 0 || args.contains(action.getName()));
+    }
+
+    private Map<String, DiscoveredAction> collectActionsMatching(HowtoApp howto, boolean all, final Predicate<DiscoveredAction> filter) {
         final Map<String, DiscoveredAction> cmds = new LinkedHashMap<>();
         howto.getDetectedActions(all).forEach((DiscoveredAction action) -> {
             if (action.getName().equals("help") && action.getType().equals("help")) {
                 return;
             }
 
-            if (args == null || args.size() == 0 || args.contains(action.getName())) {
+            if (filter.test(action)) {
                 cmds.put(action.getName(), action);
             }
 
