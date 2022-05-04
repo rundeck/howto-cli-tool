@@ -34,8 +34,8 @@ jobs:
         with:
           fail_on_unmatched_files: true
           files: |
-            app/build/distributions/howto-*.zip
-            app/build/distributions/howto-*.tar
-            app/build/graal/howto
+            app/build/distributions/how-*.zip
+            app/build/distributions/how-*.tar
+            app/build/graal/how
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
