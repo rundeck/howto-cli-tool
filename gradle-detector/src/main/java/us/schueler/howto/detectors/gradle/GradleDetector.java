@@ -25,13 +25,13 @@ public class GradleDetector implements Detector {
             return new ArrayList<>();
         }
 
-        Map<String, String> gradleActions = null;
+        Map<String, String> gradleActions;
         try {
             gradleActions = listGradleActions(gradleBase, howto.getBaseDir().getAbsoluteFile());
         } catch (IOException | InterruptedException ignored) {
             return new ArrayList<>();
         }
-        final List<DiscoveredAction> actions = new ArrayList<DiscoveredAction>();
+        final List<DiscoveredAction> actions = new ArrayList<>();
         final List<String> strings = getActionStrings(gradleBase, howto.getBaseDir().getAbsoluteFile());
         gradleActions.forEach((key, val) -> {
             CommandAction action = new CommandAction();
@@ -92,7 +92,7 @@ public class GradleDetector implements Detector {
                 String line;
 // bri may be empty or incomplete.
                 while ((line = bri.readLine()) != null) {
-                    sink.accept(line);
+                    if (sink != null) sink.accept(line);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
