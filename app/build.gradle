@@ -59,10 +59,7 @@ tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
 }
-configurations {
-    nativeDist
-    nativeBuild
-}
+
 task copyNative(type: Copy) {
     dependsOn nativeImage
     inputs.file("${buildDir}/graal/how-${project.version}")
@@ -86,8 +83,4 @@ task nativeDistZip(type: Zip) {
     from "${buildDir}/nativeDist/content"
     destinationDirectory = file("${buildDir}/nativeDist")
     archiveFileName = "how-native-${project.version}.zip"
-}
-artifacts {
-    add('archives', nativeDistZip)
-    nativeBuild file:file("${buildDir}/graal/how-${project.version}"), builtBy: nativeImage
 }
