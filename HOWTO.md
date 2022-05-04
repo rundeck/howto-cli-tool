@@ -50,6 +50,12 @@ Release the project.
 
     ./gradlew release
 
+## Version
+
+Get current version from axion-release plugin
+
+    ./gradlew currentVersion
+
 ## Pond
 
 Toss a coin in the pond!
