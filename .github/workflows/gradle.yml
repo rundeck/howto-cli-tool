@@ -42,4 +42,8 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: Package
-        path: app/build/libs
+        path: app/build/distributions
+    - uses: actions/upload-artifact@v3
+      with:
+        name: Package
+        path: app/build/graal
