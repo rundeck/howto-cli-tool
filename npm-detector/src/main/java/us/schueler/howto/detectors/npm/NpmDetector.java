@@ -1,6 +1,5 @@
 package us.schueler.howto.detectors.npm;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import us.schueler.howto.Howto;
 import us.schueler.howto.detectors.CommandAction;
@@ -10,7 +9,6 @@ import us.schueler.howto.model.DiscoveredAction;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,16 +23,27 @@ public class NpmDetector implements Detector {
             return new ArrayList<>();
         }
 
-
-        final List<DiscoveredAction> actions = new ArrayList<DiscoveredAction>();
+        final List<DiscoveredAction> actions = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
-        Package packagejson = null;
+        Map packagejson;
         try {
-            packagejson = objectMapper.readValue(jsonFile, Package.class);
+            packagejson = objectMapper.readValue(jsonFile, Map.class);
         } catch (IOException e) {
+            if (howto.isDebug()) {
+                System.err.println("Error reading json file: " + e);
+                e.printStackTrace(System.err);
+            }
             return new ArrayList<>();
         }
-        packagejson.getScripts().forEach((key, val) -> {
+        Map<String, String> scripts = null;
+        if (packagejson.get("scripts") instanceof Map) {
+            scripts = (Map<String, String>) packagejson.get("scripts");
+
+        }
+        if (scripts == null) {
+            return new ArrayList<>();
+        }
+        scripts.forEach((key, val) -> {
             CommandAction action = new CommandAction();
             action.setType("npm");
             action.setName(key);
@@ -52,16 +61,4 @@ public class NpmDetector implements Detector {
         return "npm";
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class Package {
-        public Map<String, String> getScripts() {
-            return scripts;
-        }
-
-        public void setScripts(Map<String, String> scripts) {
-            this.scripts = scripts;
-        }
-
-        private Map<String, String> scripts = new HashMap<String, String>();
-    }
 }
