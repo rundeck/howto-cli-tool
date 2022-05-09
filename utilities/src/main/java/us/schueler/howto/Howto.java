@@ -8,7 +8,10 @@ import us.schueler.howto.model.DiscoveredAction;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Howto implements HowtoApp {
     private static final ServiceLoader<Detector> detectorLoader = ServiceLoader.load(Detector.class);
@@ -66,12 +69,45 @@ public class Howto implements HowtoApp {
     }
 
     public int invoke(final String name, List<String> args) {
-        DiscoveredAction action = getDetectedActions().stream().filter((it) -> it.getName().equals(name)).findFirst().orElse(null);
+        DiscoveredAction action = findInvocationAction(name);
         if (action == null) {
             return -1;
         }
 
         return action.invoke(this, args);
+    }
+
+    /**
+     * @param name action name
+     * @return possible suggested actions for the input action name
+     */
+    public List<DiscoveredAction> suggestions(final String name) {
+        return getDetectedActions().stream().filter(nameContains(name)).collect(Collectors.toList());
+    }
+
+    private DiscoveredAction findInvocationAction(String name) {
+        Optional<DiscoveredAction> match = getDetectedActions().stream().filter(equalsPrefix(name)).findFirst();
+        if (match.isPresent()) {
+            return match.get();
+        }
+        //find prefixed
+        List<DiscoveredAction> prefixed = getDetectedActions().stream().filter(startsWith(name)).collect(Collectors.toList());
+        if (prefixed.size() == 1) {
+            return prefixed.get(0);
+        }
+        return null;
+    }
+
+    private Predicate<DiscoveredAction> equalsPrefix(String name) {
+        return (it) -> it.getName().equals(name);
+    }
+
+    private Predicate<DiscoveredAction> nameContains(String name) {
+        return (it) -> it.getName().contains(name);
+    }
+
+    private Predicate<DiscoveredAction> startsWith(String name) {
+        return (it) -> it.getName().startsWith(name);
     }
 
     public File getBaseDir() {
