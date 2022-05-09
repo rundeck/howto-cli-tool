@@ -49,7 +49,7 @@ public class NpmDetector implements Detector {
             action.setName(key);
             action.setTitle(key);
             action.setDescription("Runs npm script \"" + key + "\"\n\n> " + val);
-            action.setInvocationString("npm run" + key);
+            action.setInvocationString("npm run " + key);
             action.setSourceFile(jsonFile);
             actions.add(action);
         });
