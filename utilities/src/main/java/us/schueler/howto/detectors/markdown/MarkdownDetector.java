@@ -152,6 +152,7 @@ public class MarkdownDetector implements Detector {
         @Override
         public void visit(Paragraph paragraph) {
             visitChildren(paragraph);
+            addDescription("\n");
         }
 
         @Override
@@ -159,7 +160,7 @@ public class MarkdownDetector implements Detector {
             if (textCapture!=null) {
                 textCapture.accept(text.getLiteral());
             } else if (state.equals(ParseState.H2_CONTENT)) {
-                addDescription(text.getLiteral() + "\n");
+                addDescription(text.getLiteral());
             }
 
             super.visit(text);
@@ -186,7 +187,8 @@ public class MarkdownDetector implements Detector {
         @Override
         public void visit(Code code) {
             if (state.equals(ParseState.H2_CONTENT)) {
-                actionInvocation(code.getLiteral());
+                codeText = code.getLiteral();
+                addDescription("`" + code.getLiteral() + "`");
             }
 
             visitChildren(code);
@@ -194,7 +196,10 @@ public class MarkdownDetector implements Detector {
 
         private void pushAction() {
             if (state.equals(ParseState.H2_CONTENT)) {
-                if ((action.getInvocationString()!=null || action.getDescription()!=null) && action.getName()!=null) {
+                if (action.getInvocationString() == null && null != codeText) {
+                    actionInvocation(codeText);
+                }
+                if ((action.getInvocationString() != null || action.getDescription() != null) && action.getName() != null) {
                     actions.add(action);
                 }
 
@@ -276,6 +281,7 @@ public class MarkdownDetector implements Detector {
         private CommandAction action;
         private Pattern h1search = null;
         private StringHolder textCapture = null;
+        private String codeText = null;
         private ParseState state = ParseState.NONE;
     }
 
