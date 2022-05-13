@@ -22,7 +22,7 @@ public class App {
             args = new String[]{"help"};
         }
 
-        System.exit(new CommandLine(new App()).execute(args));
+        System.exit(new CommandLine(new App()).setExpandAtFiles(false).execute(args));
     }
 
     @CommandLine.Command(name = "help", aliases = {"list", "ls", "to"}, description = "List available actions")
