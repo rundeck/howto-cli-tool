@@ -43,6 +43,14 @@ public class NpmDetector implements Detector {
         if (scripts == null) {
             return new ArrayList<>();
         }
+        //automatic npm install command
+        actions.add(createNpmInstall(jsonFile));
+        final File packageLock = new File(howto.getBaseDir(), "package-lock.json");
+        if (packageLock.exists()) {
+            //automatic npm ci
+            actions.add(createNpmCi(packageLock));
+        }
+
         scripts.forEach((key, val) -> {
             CommandAction action = new CommandAction();
             action.setType("npm");
@@ -55,6 +63,28 @@ public class NpmDetector implements Detector {
         });
 
         return actions;
+    }
+
+    private CommandAction createNpmInstall(File jsonFile) {
+        CommandAction action = new CommandAction();
+        action.setType("npm");
+        action.setName("npm-install");
+        action.setTitle("NPM Install");
+        action.setDescription("Runs npm install");
+        action.setInvocationString("npm install");
+        action.setSourceFile(jsonFile);
+        return action;
+    }
+
+    private CommandAction createNpmCi(File jsonFile) {
+        CommandAction action = new CommandAction();
+        action.setType("npm");
+        action.setName("npm-ci");
+        action.setTitle("NPM CI");
+        action.setDescription("Runs npm ci");
+        action.setInvocationString("npm ci");
+        action.setSourceFile(jsonFile);
+        return action;
     }
 
     public final String getName() {
