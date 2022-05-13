@@ -90,12 +90,54 @@ public class Howto implements HowtoApp {
         if (match.isPresent()) {
             return match.get();
         }
+        setVerbose(true);
         //find prefixed
         List<DiscoveredAction> prefixed = getDetectedActions().stream().filter(startsWith(name)).collect(Collectors.toList());
         if (prefixed.size() == 1) {
             return prefixed.get(0);
         }
+
+        //find hyphen-abbreviated.  some-action can be abbreviated s-a
+        if (!name.matches("[a-z]-[a-z]")) {
+            return null;
+        }
+
+        List<DiscoveredAction> abbrev = getDetectedActions().stream().filter((it) -> abbreviatedHyphenated(name, it.getName())).collect(Collectors.toList());
+        if (abbrev.size() == 1) {
+            return abbrev.get(0);
+        }
         return null;
+    }
+
+    static boolean abbreviationCamelcase(String input, String name) {
+        char[] split = input.toCharArray();
+        String[] parts = name.split("-");
+        if (split.length <= parts.length && split.length > 0) {
+            for (int i = 0; i < split.length; i++) {
+                if (Character.toLowerCase(parts[i].charAt(0)) != Character.toLowerCase(split[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    static boolean abbreviatedHyphenated(String input, String name) {
+        String[] inputParts = input.split("-");
+        String[] nameParts = name.split("-");
+        if (inputParts.length <= nameParts.length && inputParts.length > 0) {
+            for (int i = 0; i < inputParts.length; i++) {
+                if (inputParts[i].length() < 1) {
+                    return false;
+                }
+                if (!nameParts[i].toLowerCase().startsWith(inputParts[i].toLowerCase())) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     private Predicate<DiscoveredAction> equalsPrefix(String name) {
