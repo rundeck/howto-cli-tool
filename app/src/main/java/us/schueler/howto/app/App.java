@@ -12,10 +12,10 @@ import java.util.List;
 @CommandLine.Command(name = "howto", versionProvider = VersionProvider.class, mixinStandardHelpOptions = true, description = "Discover how to do things and do them")
 public class App {
     public static void main(String[] args) {
-        List<String> allowed = Arrays.asList("-V", "--version", "-h", "--help", "help", "ls", "list", "run", "do", "to");
+        List<String> allowed = Arrays.asList("-V", "--version", "-h", "--help", "help", "ls", "list", "run", "do", "to", "exec");
         if (args.length > 0 && !allowed.contains(args[0])) {
             //assume a run command is intended
-            ArrayList<String> run = new ArrayList<>(Collections.singletonList("run"));
+            ArrayList<String> run = new ArrayList<>(Collections.singletonList("to"));
             run.addAll(Arrays.asList(args));
             args = run.toArray(new String[]{});
         } else if (args.length == 0) {
@@ -25,7 +25,7 @@ public class App {
         System.exit(new CommandLine(new App()).setExpandAtFiles(false).execute(args));
     }
 
-    @CommandLine.Command(name = "help", aliases = {"list", "ls", "to"}, description = "List available actions")
+    @CommandLine.Command(name = "to", aliases = {"list", "ls", "help"}, description = "List available actions")
     public int help(@CommandLine.Option(names = {"-d", "--dir"}, description = "Base dir") File baseDir,
                     @CommandLine.Option(names = {"-v", "--verbose"}, description = "Verbose") boolean verbose,
                     @CommandLine.Option(names = {"-a", "--all"}, description = "All") boolean all,
@@ -34,7 +34,7 @@ public class App {
         return run(baseDir, args != null && args.size() > 0 || verbose, all, debug, "help", args);
     }
 
-    @CommandLine.Command(name = "run", aliases = {"do"}, description = "Run an action")
+    @CommandLine.Command(name = "do", aliases = {"run", "exec"}, description = "Run an action")
     public int run(@CommandLine.Option(names = {"-d", "--dir"}, description = "Base dir") File baseDir,
                    @CommandLine.Option(names = {"-v", "--verbose"}, description = "Verbose") boolean verbose,
                    @CommandLine.Option(names = {"-a", "--all"}, description = "All") boolean all,
