@@ -20,6 +20,7 @@ public class Howto implements HowtoApp {
     private boolean verbose;
     private boolean all;
     private boolean debug;
+    private List<String> excludeTypes = new ArrayList<>();
 
     public Howto(File baseDir) {
         this.baseDir = baseDir;
@@ -43,14 +44,24 @@ public class Howto implements HowtoApp {
         if (!all && null != baseFound) {
             return baseFound;
         }
-        List<DiscoveredAction> detectedActions = new ArrayList<>(new HelpDetector().getActions(this));
-        List<DiscoveredAction> mdactions = new MarkdownDetector().getActions(this);
-        if (mdactions != null && mdactions.size() > 0) {
-            detectedActions.addAll(mdactions);
+        List<DiscoveredAction> actions = new ArrayList<>(new HelpDetector().getActions(this));
+        List<DiscoveredAction> detectedActions = new ArrayList<>();
+        MarkdownDetector markdownDetector = new MarkdownDetector();
+        if (!isExcludedDetector(markdownDetector)) {
+            List<DiscoveredAction> mdactions = markdownDetector.getActions(this);
+            if (mdactions != null && mdactions.size() > 0) {
+                detectedActions.addAll(mdactions);
+            }
         }
 
-        if (mdactions == null || mdactions.size() < 1 || all) {
+        if (detectedActions.size() < 1 || all) {
             for (Detector detector : getDetectors()) {
+                if (isExcludedDetector(detector)) {
+                    if (isDebug()) {
+                        System.err.println("Excluded detector: " + detector.getName());
+                    }
+                    continue;
+                }
                 if (isDebug()) {
                     System.err.println("Loaded detector: " + detector.getName());
                 }
@@ -58,6 +69,7 @@ public class Howto implements HowtoApp {
             }
 
         }
+        actions.addAll(detectedActions);
         if (all) {
             allFound = detectedActions;
         }
@@ -65,7 +77,11 @@ public class Howto implements HowtoApp {
             baseFound = detectedActions;
         }
 
-        return detectedActions;
+        return actions;
+    }
+
+    private boolean isExcludedDetector(Detector detector) {
+        return null != excludeTypes && excludeTypes.contains(detector.getName());
     }
 
     public int invoke(final String name, List<String> args) {
@@ -192,6 +208,14 @@ public class Howto implements HowtoApp {
 
     public void setDebug(boolean debug) {
         this.debug = debug;
+    }
+
+    public List<String> getExcludeTypes() {
+        return excludeTypes;
+    }
+
+    public void setExcludeTypes(List<String> excludeTypes) {
+        this.excludeTypes = excludeTypes;
     }
 
 }
