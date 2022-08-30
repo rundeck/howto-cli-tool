@@ -42,7 +42,7 @@ more action
         actions[0].description == 'description\n'
         actions[1].name == 'action-2'
         actions[1].invocationString == 'another action'
-        actions[1].description == 'more\ndescription\n'
+        actions[1].description == 'more\ndescription\n`another action`\n'
         actions[2].name == 'action-3'
         actions[2].invocationString == 'more action\n'
         actions[2].description == 'blah\n'
