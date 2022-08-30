@@ -123,7 +123,7 @@ public class Howto implements HowtoApp {
         return false;
     }
 
-    static boolean abbreviatedHyphenated(String input, String name) {
+    public static boolean abbreviatedHyphenated(String input, String name) {
         String[] inputParts = input.split("-");
         String[] nameParts = name.split("-");
         if (inputParts.length <= nameParts.length && inputParts.length > 0) {

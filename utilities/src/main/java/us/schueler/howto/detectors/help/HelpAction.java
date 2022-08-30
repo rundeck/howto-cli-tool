@@ -1,6 +1,7 @@
 package us.schueler.howto.detectors.help;
 
 import picocli.CommandLine;
+import us.schueler.howto.Howto;
 import us.schueler.howto.HowtoApp;
 import us.schueler.howto.detectors.BaseAction;
 import us.schueler.howto.model.DiscoveredAction;
@@ -100,7 +101,12 @@ public class HelpAction extends BaseAction {
     }
 
     private Map<String, DiscoveredAction> collectActionsAllOrEqual(HowtoApp howto, boolean all, final List<String> args) {
-        return collectActionsMatching(howto, all, (action) -> args == null || args.size() == 0 || args.contains(action.getName()) || args.stream().anyMatch(s -> action.getName().startsWith(s)));
+        return collectActionsMatching(howto, all, (action) -> args == null
+                || args.size() == 0
+                || args.contains(action.getName())
+                || args.stream().anyMatch(s -> action.getName().startsWith(s))
+                || args.stream().anyMatch(s -> Howto.abbreviatedHyphenated(s, action.getName()))
+        );
     }
 
     private Map<String, DiscoveredAction> collectActionsMatching(HowtoApp howto, boolean all, final Predicate<DiscoveredAction> filter) {
