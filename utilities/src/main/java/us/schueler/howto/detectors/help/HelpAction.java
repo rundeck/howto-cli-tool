@@ -100,7 +100,7 @@ public class HelpAction extends BaseAction {
     }
 
     private Map<String, DiscoveredAction> collectActionsAllOrEqual(HowtoApp howto, boolean all, final List<String> args) {
-        return collectActionsMatching(howto, all, (action) -> args == null || args.size() == 0 || args.contains(action.getName()));
+        return collectActionsMatching(howto, all, (action) -> args == null || args.size() == 0 || args.contains(action.getName()) || args.stream().anyMatch(s -> action.getName().startsWith(s)));
     }
 
     private Map<String, DiscoveredAction> collectActionsMatching(HowtoApp howto, boolean all, final Predicate<DiscoveredAction> filter) {
