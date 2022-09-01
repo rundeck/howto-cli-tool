@@ -58,6 +58,10 @@ A little luck.
    * ... (add your own!)
 3. It introspects available actions for the build tool(s) found
 
+## Download
+
+See the [Releases](https://github.com/rundeckpro/howto-cli-tool/releases) section.
+
 
 # Writing a Howto doc
 
