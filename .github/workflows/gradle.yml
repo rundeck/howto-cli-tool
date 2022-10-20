@@ -18,8 +18,11 @@ permissions:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
 
     steps:
     - uses: actions/checkout@v3
@@ -41,9 +44,9 @@ jobs:
         arguments: :app:nativeImage
     - uses: actions/upload-artifact@v3
       with:
-        name: JavaDist
+        name: JavaDist ${{ matrix.os }}
         path: app/build/distributions
     - uses: actions/upload-artifact@v3
       with:
-        name: NativeBuild
+        name: NativeBuild ${{ matrix.os }}
         path: app/build/graal
