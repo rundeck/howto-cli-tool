@@ -13,9 +13,13 @@ on:
       - 'v[0-9]+.[0-9]+.[0-9]+' # Push events to matching semver 20.15.10
 
 jobs:
-  publish:
-
-    runs-on: ubuntu-latest
+  publish_artifacts:
+    needs: create_release
+    name: Publish Artifacts for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -29,13 +33,27 @@ jobs:
         uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
         with:
           arguments: build :app:nativeDistZip
-      - name: Release
+      - name: Get Release Version
+        id: get_version
+        run: VERSION=$(./gradlew currentVersion -q -Prelease.quiet) && echo ::set-output name=VERSION::$VERSION
+      - name: Rename files
+        shell: |
+          mv app/build/nativeDist/how-native*.zip app/build/nativeDist/how-${{matrix.os}}-${{ steps.get_version.outputs.VERSION }}.zip
+      - name: Upload Release Files
         uses: softprops/action-gh-release@v1
         with:
           fail_on_unmatched_files: true
           files: |
             app/build/distributions/how-*.zip
-            app/build/distributions/how-*.tar
-            app/build/nativeDist/how-native-*.zip
+            app/build/nativeDist/how-${{matrix.os}}-${{ steps.get_version.outputs.VERSION }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  create_release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Github Release
+        uses: softprops/action-gh-release@v1
+        id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
