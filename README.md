@@ -87,6 +87,12 @@ If you want to accept arguments use `"${@}"` (for bash)
 
     `sh build.sh "${@}"`
 
+If you want to reference the directory containing the HOWTO doc that is used, an environment variable is set: `DIR`
+
+    ```
+    cat "${DIR}/somefile"
+    ```
+
 # Using other build tools
 
 If no "howto.md" or `# Howto` section in the readme is found,

@@ -12,7 +12,7 @@ public class CommandAction extends BaseAction {
     @Override
     public int invoke(HowtoApp howto, List<String> args) {
         List<String> invocation = getInvocation(args);
-        if (invocation == null || invocation.size() < 1) {
+        if (invocation == null || invocation.isEmpty()) {
             System.out.println("TODO: unable to automatically execute the action on this OS, sorry!");
             System.out.println("You should execution manually:\n\n" + getInvocationString());
             return 1;
@@ -22,7 +22,9 @@ public class CommandAction extends BaseAction {
         }
 
         try {
-            Process proc = new ProcessBuilder(invocation).directory(howto.getBaseDir()).inheritIO().start();
+            ProcessBuilder builder = new ProcessBuilder(invocation).directory(howto.getBaseDir()).inheritIO();
+            builder.environment().put("DIR", howto.getBaseDir().getAbsolutePath());
+            Process proc = builder.start();
             return proc.waitFor();
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
