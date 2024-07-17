@@ -8,18 +8,11 @@ plugins {
 
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
-
-    id 'com.palantir.graal' version '0.10.0'
+    alias(libs.plugins.shadow)
 }
+apply plugin: 'com.github.johnrengelman.shadow'
 
-apply plugin: 'com.palantir.graal'
-graal {
-    mainClass 'us.schueler.howto.app.App'
-    outputName "how-${project.version}"
-    option '--no-fallback'
-    option '--allow-incomplete-classpath'
-    javaVersion('11')
-}
+
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
@@ -42,47 +35,16 @@ dependencies {
     implementation project(':npm-detector')
     implementation project(':gradle-detector')
 
-    implementation 'info.picocli:picocli:4.6.3'
-    annotationProcessor 'info.picocli:picocli-codegen:4.6.3'
+    implementation libs.picocli
+    annotationProcessor libs.picocliCodegen
 
-    // Use the latest Groovy version for building this library
-    testImplementation 'org.codehaus.groovy:groovy-all:3.0.10'
-    // Use the awesome Spock testing and specification framework even with Java
-    testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
-    testImplementation 'junit:junit:4.13.2'
-}
-compileJava {
-    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+    testImplementation libs.bundles.test
 }
 
+//force distZip/distTar artifacts to be overwritten by shadow versions
+shadowDistZip.mustRunAfter distZip
+shadowDistTar.mustRunAfter distTar
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
-}
-
-task copyNative(type: Copy) {
-    dependsOn nativeImage
-    inputs.file("${buildDir}/graal/how-${project.version}")
-    outputs.file("${buildDir}/nativeDist/content/bin/how")
-    from "${buildDir}/graal/how-${project.version}"
-    into "${buildDir}/nativeDist/content/bin"
-
-    rename { filename ->
-        "how"
-    }
-    doFirst {
-        file("${buildDir}/nativeDist/content/bin").mkdirs()
-    }
-}
-task nativeDistZip(type: Zip) {
-    group('Distribution')
-    description('Build native image and package it into a zip file')
-    dependsOn copyNative
-    outputs.file("${buildDir}/nativeDist/how-native-${project.version}.zip")
-    doFirst {
-        file("${buildDir}/nativeDist/content").mkdirs()
-    }
-    from "${buildDir}/nativeDist/content"
-    destinationDirectory = file("${buildDir}/nativeDist")
-    archiveFileName = "how-native-${project.version}.zip"
 }
