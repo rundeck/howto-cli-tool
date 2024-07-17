@@ -2,20 +2,19 @@ import java.text.SimpleDateFormat
 plugins {
     // Apply the groovy Plugin to add support for Groovy.
     id 'groovy'
-    id 'com.github.gmazzo.buildconfig' version '3.0.3'
+    alias(libs.plugins.buildconfig)
 }
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation 'com.atlassian.commonmark:commonmark:0.17.0'
-    implementation 'com.atlassian.commonmark:commonmark-ext-autolink:0.17.0'
+    implementation libs.commonmark
+    implementation libs.commonmarkExtAutolink
     // Use the latest Groovy version for building this library
-    implementation 'info.picocli:picocli:4.6.3'
-    testImplementation 'org.codehaus.groovy:groovy-all:3.0.10'
-    testImplementation 'org.spockframework:spock-core:2.1-groovy-3.0'
-    testImplementation 'junit:junit:4.13.2'
+    implementation libs.picocli
+
+    testImplementation libs.bundles.test
 }
 
 test {

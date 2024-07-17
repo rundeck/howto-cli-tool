@@ -1,0 +1,36 @@
+[versions]
+
+junit = "4.13.2"
+groovy = "3.0.15"
+spock = "2.1-groovy-3.0"
+axion = "1.18.2"
+shadow = "7.1.2"
+picocli = "4.6.3"
+commonmark = "0.17.0"
+buildconfig = "3.0.3"
+jackson = "2.15.3"
+
+[libraries]
+
+
+junit = { module = "junit:junit", version.ref = "junit" }
+groovy = { module = "org.codehaus.groovy:groovy-all", version.ref = "groovy" }
+spock = { module = "org.spockframework:spock-core", version.ref = "spock" }
+
+picocli = { module = 'info.picocli:picocli', version.ref = "picocli" }
+picocliCodegen = { module = 'info.picocli:picocli-codegen', version.ref = "picocli" }
+
+commonmark = { module = "com.atlassian.commonmark:commonmark", version.ref = "commonmark" }
+commonmarkExtAutolink = { module = "com.atlassian.commonmark:commonmark-ext-autolink", version.ref = "commonmark" }
+
+
+jacksonDatabind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+[bundles]
+
+test = ["junit", "groovy", "spock"]
+
+[plugins]
+
+axion = { id = "pl.allegro.tech.build.axion-release", version.ref = "axion" }
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
