@@ -15,11 +15,8 @@ on:
 jobs:
   publish_artifacts:
     needs: create_release
-    name: Publish Artifacts for ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
+    name: Publish Artifacts
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
