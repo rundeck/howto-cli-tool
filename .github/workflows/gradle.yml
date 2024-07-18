@@ -18,12 +18,8 @@ permissions:
 
 jobs:
   build:
-    name: Build on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest]
-
+    name: Build
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
       with:
@@ -32,21 +28,16 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '11'
-        distribution: 'temurin'
+        distribution: 'zulu'
     - name: Build with Gradle
       uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
       with:
         arguments: :app:build
-        
-    - name: Build Native image
-      uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
-      with:
-        arguments: :app:nativeImage
     - uses: actions/upload-artifact@v3
       with:
-        name: JavaDist ${{ matrix.os }}
+        name: Distributions
         path: app/build/distributions
     - uses: actions/upload-artifact@v3
       with:
-        name: NativeBuild ${{ matrix.os }}
-        path: app/build/graal
+        name: Jars
+        path: app/build/libs

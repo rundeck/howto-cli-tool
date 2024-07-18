@@ -8,8 +8,8 @@ repositories {
 
 dependencies {
     implementation project(":utilities")
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2.2'
-    testImplementation 'org.codehaus.groovy:groovy-all:3.0.10'
+    implementation libs.jacksonDatabind
+    testImplementation libs.bundles.test
 }
 
 test {
