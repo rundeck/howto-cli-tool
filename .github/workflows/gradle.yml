@@ -22,8 +22,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest]
-
+        os: [ubuntu-latest]
     steps:
     - uses: actions/checkout@v3
       with:
@@ -37,16 +36,7 @@ jobs:
       uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
       with:
         arguments: :app:build
-        
-    - name: Build Native image
-      uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
-      with:
-        arguments: :app:nativeImage
     - uses: actions/upload-artifact@v3
       with:
         name: JavaDist ${{ matrix.os }}
         path: app/build/distributions
-    - uses: actions/upload-artifact@v3
-      with:
-        name: NativeBuild ${{ matrix.os }}
-        path: app/build/graal
