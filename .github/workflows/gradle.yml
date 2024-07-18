@@ -35,5 +35,9 @@ jobs:
         arguments: :app:build
     - uses: actions/upload-artifact@v3
       with:
-        name: JavaDist ${{ matrix.os }}
+        name: Distributions
         path: app/build/distributions
+    - uses: actions/upload-artifact@v3
+      with:
+        name: Jars
+        path: app/build/libs
