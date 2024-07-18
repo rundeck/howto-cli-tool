@@ -12,7 +12,15 @@ plugins {
 }
 apply plugin: 'com.github.johnrengelman.shadow'
 
-
+archivesBaseName = 'how'
+distributions {
+    main {
+        distributionBaseName = 'how'
+    }
+    shadow {
+        distributionBaseName = 'how'
+    }
+}
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
