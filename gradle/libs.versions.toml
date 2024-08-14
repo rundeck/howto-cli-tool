@@ -2,7 +2,7 @@
 
 junit = "4.13.2"
 groovy = "3.0.22"
-spock = "2.1-groovy-3.0"
+spock = "2.3-groovy-4.0"
 axion = "1.18.4"
 shadow = "8.1.1"
 picocli = "4.7.6"
