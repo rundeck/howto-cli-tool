@@ -1,7 +1,7 @@
 [versions]
 
 junit = "4.13.2"
-groovy = "3.0.15"
+groovy = "3.0.22"
 spock = "2.1-groovy-3.0"
 axion = "1.18.2"
 shadow = "7.1.2"
