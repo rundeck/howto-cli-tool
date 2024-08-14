@@ -30,7 +30,7 @@ jobs:
         java-version: '11'
         distribution: 'zulu'
     - name: Build with Gradle
-      uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
+      uses: gradle/gradle-build-action@093dfe9d598ec5a42246855d09b49dc76803c005
       with:
         arguments: :app:build
     - uses: actions/upload-artifact@v3
