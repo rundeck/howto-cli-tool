@@ -33,6 +33,8 @@ jobs:
         id: get_version
         run: VERSION=$(./gradlew currentVersion -q -Prelease.quiet) && echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
       - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh release create \
             --generate-notes \
