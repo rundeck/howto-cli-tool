@@ -18,10 +18,10 @@ jobs:
             --url https://api.github.com/repos/rundeckpro/howto-cli-tool/releases/latest )
           echo "$res"
 
-          url=$(jq -r '.assets[] |  select ( .name | test( "^how-.*-all.jar$") ) | .browser_download_url' <<< "$res")
+          url=$(jq -r '.assets[] |  select ( .name | test( "^how-.*-all.jar$") ) | .url' <<< "$res")
           version=$(echo $url | sed -E 's/.*-([0-9]\.[0-9]+\.[0-9]+).*/\1/')
 
-          curl -s -H "Accept: application/octet-stream" \
+          curl -f -s -H "Accept: application/octet-stream" \
             -H "Authorization: Bearer $GH_TOKEN"  -L -o /tmp/tmp.file $url
           if [ $? != 0 ] ; then
             echo "Download failed for URL $url"
