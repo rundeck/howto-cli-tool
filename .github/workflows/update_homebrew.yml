@@ -1,4 +1,4 @@
-name: Test homebrew update
+name: Update homebrew repo
 
 on: workflow_dispatch
 
