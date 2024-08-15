@@ -21,7 +21,12 @@ jobs:
           url=$(jq -r '.assets[] |  select ( .name | test( "^how-.*-all.jar$") ) | .browser_download_url' <<< "$res")
           version=$(echo $url | sed -E 's/.*-([0-9]\.[0-9]+\.[0-9]+).*/\1/')
 
-          curl -L -o /tmp/tmp.file $url
+          curl -s -H "Accept: application/octet-stream" \
+            -H "Authorization: Bearer $GH_TOKEN"  -L -o /tmp/tmp.file $url
+          if [ $? != 0 ] ; then
+            echo "Download failed for URL $url"
+            exit 2
+          fi
           sha=$(sha256sum /tmp/tmp.file | cut -d' ' -f1)
           echo "✅ Found version $version: sha $sha: $url" | tee -a $GITHUB_STEP_SUMMARY
           echo "url=$url" >> $GITHUB_OUTPUT
