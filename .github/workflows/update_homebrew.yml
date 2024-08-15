@@ -19,7 +19,8 @@ jobs:
           echo "$res"
 
           url=$(jq -r '.assets[] |  select ( .name | test( "^how-.*-all.jar$") ) | .url' <<< "$res")
-          version=$(echo $url | sed -E 's/.*-([0-9]\.[0-9]+\.[0-9]+).*/\1/')
+          name=$(jq -r '.assets[] |  select ( .name | test( "^how-.*-all.jar$") ) | .name' <<< "$res")
+          version=$(echo $name | sed -E 's/.*-([0-9]\.[0-9]+\.[0-9]+).*/\1/')
 
           curl -f -s -H "Accept: application/octet-stream" \
             -H "Authorization: Bearer $GH_TOKEN"  -L -o /tmp/tmp.file $url
