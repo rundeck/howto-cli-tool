@@ -42,3 +42,5 @@ jobs:
             ${{ github.ref_name }} \
             ./app/build/distributions/how-${{ steps.get_version.outputs.VERSION }}.zip \
             ./app/build/libs/how-${{ steps.get_version.outputs.VERSION }}-all.jar
+      - name: trigger homebrew update
+        run: gh workflow run update_homebrew.yml
