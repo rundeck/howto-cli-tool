@@ -1,7 +1,7 @@
 [versions]
 
 junit = "4.13.2"
-groovy = "3.0.22"
+groovy = "4.0.4"
 spock = "2.3-groovy-4.0"
 axion = "1.18.4"
 shadow = "8.1.1"
@@ -14,7 +14,7 @@ jackson = "2.17.2"
 
 
 junit = { module = "junit:junit", version.ref = "junit" }
-groovy = { module = "org.codehaus.groovy:groovy-all", version.ref = "groovy" }
+groovy = { module = "org.apache.groovy:groovy-all", version.ref = "groovy" }
 spock = { module = "org.spockframework:spock-core", version.ref = "spock" }
 
 picocli = { module = 'info.picocli:picocli', version.ref = "picocli" }
