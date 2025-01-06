@@ -226,6 +226,9 @@ public class MarkdownDetector implements Detector {
         }
 
         public void addDescription(String string) {
+            if (action == null) {
+                return;
+            }
             if (action.getDescription()!=null) {
                 action.setDescription(getAction().getDescription() + string);
             } else {
