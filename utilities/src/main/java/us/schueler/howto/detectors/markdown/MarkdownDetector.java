@@ -226,6 +226,9 @@ public class MarkdownDetector implements Detector {
         }
 
         public void addDescription(String string) {
+            if (action == null) {
+                return;
+            }
             if (action.getDescription()!=null) {
                 action.setDescription(getAction().getDescription() + string);
             } else {
@@ -275,7 +278,7 @@ public class MarkdownDetector implements Detector {
             this.state = state;
         }
 
-        private List<DiscoveredAction> actions = new ArrayList<DiscoveredAction>();
+        private List<DiscoveredAction> actions = new ArrayList<>();
 
 
         private CommandAction action;
