@@ -278,7 +278,7 @@ public class MarkdownDetector implements Detector {
             this.state = state;
         }
 
-        private List<DiscoveredAction> actions = new ArrayList<DiscoveredAction>();
+        private List<DiscoveredAction> actions = new ArrayList<>();
 
 
         private CommandAction action;
