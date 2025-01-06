@@ -44,3 +44,5 @@ jobs:
             ./app/build/libs/how-${{ steps.get_version.outputs.VERSION }}-all.jar
       - name: trigger homebrew update
         run: gh workflow run update_homebrew.yml
+        env:
+          GH_TOKEN: ${{ github.token }}
