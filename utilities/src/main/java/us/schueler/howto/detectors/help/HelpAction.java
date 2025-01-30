@@ -20,38 +20,31 @@ public class HelpAction extends BaseAction {
     }
 
     private void printPlain(final HowtoApp howto, List<String> args) {
-
         List<String> tips = new ArrayList<>();
         Map<String, DiscoveredAction> cmds = collectActionsAllOrEqual(howto, howto.isAll(), args);
 
-        if (cmds.size() < 1 && args != null && args.size() > 0 && !howto.isAll()) {
-            //retry using all detectors
-            cmds = collectActionsAllOrEqual(howto, true, args);
-        }
-
-
-        if (args == null || args.size() < 1) {
+        if (args == null || args.isEmpty()) {
             System.out.println(CommandLine.Help.Ansi.AUTO.string("Found Actions:"));
             System.out.println(CommandLine.Help.Ansi.AUTO.string("@|faint " + (repeatString("_", 40)) + " |@"));
-            tips.add(CommandLine.Help.Ansi.AUTO.string("see more: @|green how to|@ @|white [action]|@"));
-            tips.add(CommandLine.Help.Ansi.AUTO.string("do the action: @|green how do|@ @|white [action]|@ [args]"));
-        } else {
-            tips.add(CommandLine.Help.Ansi.AUTO.string("do the thing with: @|green how do|@ @|white [action]|@ [args]"));
-            tips.add(CommandLine.Help.Ansi.AUTO.string("or just: @|green how|@ @|white [action]|@ [args]"));
         }
 
-        if (cmds.size() < 1) {
-            System.out.println(CommandLine.Help.Ansi.AUTO.string("@|faint No actions were found.|@"));
+        if (cmds.isEmpty()) {
+            System.out.printf(CommandLine.Help.Ansi.AUTO.string("@|faint No actions were found similar to: %s|@\n"), String.join(" ", args));
             if (args != null && args.size() == 1) {
                 //find similar
                 String test = args.get(0);
-                Map<String, DiscoveredAction> similar = collectActionsMatching(howto, true, (action) -> action.getName().contains(test));
+                Map<String, DiscoveredAction> similar = collectActionsMatching(howto, howto.isAll(), (action) -> action.getName().contains(test));
                 if(!similar.isEmpty()){
                     System.out.println(CommandLine.Help.Ansi.AUTO.string("@|faint Did you mean?|@"));
                     similar.forEach((n,a)-> System.out.println(CommandLine.Help.Ansi.AUTO.string("@|faint - "+n+"|@")));
-
+                }else if(!howto.isAll()){
+                    tips.add(CommandLine.Help.Ansi.AUTO.string("search all detectors: @|green how to -a "+args+"|@"));
                 }
             }
+        } else {
+            tips.add(CommandLine.Help.Ansi.AUTO.string("see more: @|green how to|@ @|white action|@"));
+            tips.add(CommandLine.Help.Ansi.AUTO.string("do the action: @|green how do|@ @|white action|@ -- args"));
+            tips.add(CommandLine.Help.Ansi.AUTO.string("or just: @|green how|@ @|white action|@ [args]"));
         }
 
         final int max = cmds.keySet().stream().map(String::length).max(Integer::compareTo).orElse(-1);
