@@ -45,6 +45,9 @@ dependencies {
 
     implementation libs.picocli
     annotationProcessor libs.picocliCodegen
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+
 
     testImplementation libs.bundles.test
 }
