@@ -1,5 +1,6 @@
 package us.schueler.howto.detectors.npm;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import us.schueler.howto.Howto;
 import us.schueler.howto.detectors.CommandAction;
@@ -25,9 +26,9 @@ public class NpmDetector implements Detector {
 
         final List<DiscoveredAction> actions = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
-        Map packagejson;
+        PackageJson packagejson;
         try {
-            packagejson = objectMapper.readValue(jsonFile, Map.class);
+            packagejson = objectMapper.readValue(jsonFile, PackageJson.class);
         } catch (IOException e) {
             if (howto.isDebug()) {
                 System.err.println("Error reading json file: " + e);
@@ -35,11 +36,7 @@ public class NpmDetector implements Detector {
             }
             return new ArrayList<>();
         }
-        Map<String, String> scripts = null;
-        if (packagejson.get("scripts") instanceof Map) {
-            scripts = (Map<String, String>) packagejson.get("scripts");
-
-        }
+        Map<String, String> scripts = packagejson.scripts;
         if (scripts == null) {
             return new ArrayList<>();
         }
@@ -63,6 +60,11 @@ public class NpmDetector implements Detector {
         });
 
         return actions;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    static class PackageJson {
+        public Map<String, String> scripts;
     }
 
     private CommandAction createNpmInstall(File jsonFile) {
