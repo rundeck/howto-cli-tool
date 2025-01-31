@@ -13,4 +13,7 @@ subprojects { project ->
     base {
         archivesName = "how-${project.name}"
     }
+    tasks.withType(JavaCompile).configureEach {
+        options.compilerArgs << "-Xlint:unchecked"
+    }
 }
