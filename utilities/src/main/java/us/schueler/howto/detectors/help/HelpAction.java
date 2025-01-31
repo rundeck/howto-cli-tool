@@ -78,7 +78,7 @@ public class HelpAction extends BaseAction {
         }
 
 
-        if (tips.size() > 0) {
+        if (!tips.isEmpty()) {
             System.out.println(CommandLine.Help.Ansi.AUTO.string("@|faint " + (repeatString("_", 40)) + " |@"));
             tips.forEach((s) -> System.out.println(CommandLine.Help.Ansi.AUTO.string("@|cyan tip:|@ ") + s));
         }
@@ -86,16 +86,12 @@ public class HelpAction extends BaseAction {
     }
 
     private String repeatString(String s, int i) {
-        StringBuilder sb = new StringBuilder();
-        for (int x = 0; x < i; x++) {
-            sb.append(s);
-        }
-        return sb.toString();
+        return String.valueOf(s).repeat(Math.max(0, i));
     }
 
     private Map<String, DiscoveredAction> collectActionsAllOrEqual(HowtoApp howto, boolean all, final List<String> args) {
         return collectActionsMatching(howto, all, (action) -> args == null
-                || args.size() == 0
+                || args.isEmpty()
                 || args.contains(action.getName())
                 || args.stream().anyMatch(s -> action.getName().startsWith(s))
                 || args.stream().anyMatch(s -> Howto.abbreviatedHyphenated(s, action.getName()))
