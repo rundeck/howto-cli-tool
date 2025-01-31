@@ -3,7 +3,7 @@
 junit = "4.13.2"
 groovy = "4.0.4"
 spock = "2.3-groovy-4.0"
-axion = "1.18.4"
+axion = "1.18.16"
 shadow = "8.1.1"
 picocli = "4.7.6"
 commonmark = "0.17.0"
