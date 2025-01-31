@@ -8,7 +8,9 @@ allprojects {
     project.group = 'us.schueler.howto'
 }
 
-subprojects {
+subprojects { project ->
     apply plugin: 'base'
-    archivesBaseName = "how-${it.name}"
+    base {
+        archivesName = "how-${project.name}"
+    }
 }
