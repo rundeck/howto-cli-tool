@@ -29,8 +29,8 @@ public class HelpAction extends BaseAction {
         }
 
         if (cmds.isEmpty()) {
-            System.out.printf(CommandLine.Help.Ansi.AUTO.string("@|faint No actions were found similar to: %s|@\n"), String.join(" ", args));
             if (args != null && args.size() == 1) {
+                System.out.printf(CommandLine.Help.Ansi.AUTO.string("@|faint No actions were found similar to: %s|@\n"), String.join(" ", args));
                 //find similar
                 String test = args.get(0);
                 Map<String, DiscoveredAction> similar = collectActionsMatching(howto, howto.isAll(), (action) -> action.getName().contains(test));
