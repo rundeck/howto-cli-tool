@@ -45,11 +45,6 @@ Today you will have:
 A little luck.
 ```
 
-## How do I install with homebrew?
-
-1. Follow the `pd-brews` setup [defined here](https://github.com/PagerDuty/homebrew-pd_brews?tab=readme-ov-file#configuring-github-release-access).
-2. Run `brew tap rundeckpro/howto-cli-tool`
-3. Run `brew install howto`
 
 ## How does it work?
 
@@ -66,7 +61,7 @@ A little luck.
 
 ## Download
 
-See the [Releases](https://github.com/rundeckpro/howto-cli-tool/releases) section.
+See the [Releases](https://github.com/rundeck/howto-cli-tool/releases) section.
 
 
 # Writing a Howto doc
