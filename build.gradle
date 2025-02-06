@@ -5,7 +5,7 @@ plugins {
 
 allprojects {
     project.version = scmVersion.version
-    project.group = 'us.schueler.howto'
+    project.group = 'org.rundeck.howto'
 }
 
 subprojects { project ->

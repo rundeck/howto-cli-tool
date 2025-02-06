@@ -23,7 +23,7 @@ test {
 
 buildConfig {
     className "Version"
-    packageName 'us.schueler.howto'
+    packageName 'org.rundeck.howto'
 
     buildConfigField('String', 'NAME', "\"${rootProject.name}\"")
     buildConfigField('String', 'VERSION', "\"${project.version}\"")

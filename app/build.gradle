@@ -30,7 +30,7 @@ repositories {
 
 application {
     // Define the main class for the application.
-    mainClass = 'us.schueler.howto.app.App'
+    mainClass = 'org.rundeck.howto.app.App'
     applicationName = 'how'
 }
 
