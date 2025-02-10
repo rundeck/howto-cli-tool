@@ -45,6 +45,10 @@ Today you will have:
 A little luck.
 ```
 
+## How do I install with homebrew?
+
+1. Run `brew tap rundeck/howto-cli-tool`
+2. Run `brew install howto`
 
 ## How does it work?
 
