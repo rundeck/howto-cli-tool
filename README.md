@@ -51,8 +51,9 @@ A little luck.
 `how` uses various "detectors" to look for actions that the user could do.
 
 1. It looks for a `howto.md` file (or name variation of that), or a `readme.md` file
-   1. If there is a H1 section, it looks for H2s within that (`# How to` name is required within the Readme)
-   2. Each H2 section with a code block is treated as an action.
+   1. If there is a "how to" H1 section, it looks for H2s within that
+      2. Each H2 section with a code block is treated as an action.
+   2. Otherwise any H2 section with a title containing "how to" and a code block is treated as an action
 2. Otherwise, it checks various build tools, such as:
    * Gradle
    * NPM
@@ -66,15 +67,15 @@ See the [Releases](https://github.com/rundeck/howto-cli-tool/releases) section.
 
 # Writing a Howto doc
 
-Create a "howto.md". You can also name the file with a variation such as `howto.markdown` or just `HOWTO` (but the file must use Markdown formatting). 
-
-You could instead put the content in your `readme.md` file within a `# Howto` section. The H1 section just needs the words "how to", "howto" or "how-to" in the title.
+Create a "howto.md" or "readme.md". You can also name the file with a variation such as `howto.markdown` or just `HOWTO` (but the file must use Markdown formatting). 
 
 If `howto` sees both a howto.md and readme.md, it will use howto.md.
 
-Make sure the markdown file has a H1 section (and that it has the words "how to" if inside your readme.md).
+Any H2 section with the words "how to" in the title that contains a code block will be treated as an action.
 
-Within the H1 section, define H2 headings for each action you want to define. The heading will be the name of the action.
+You can also use a H1 section where the title has the words "how to", in which case all H2 sections with code blocks below it will be selected.
+
+The heading of the H2 section will be the name of the action.
 
     ## Build
 
@@ -84,7 +85,7 @@ Within the H2 section, use a code block (indented of fenced), or simple code sec
     make dist
     ```
 
-If you want to accept arguments use `"${@}"` (for bash)
+If you want to accept arguments use `"${@}"` (for bash). Pass arguments using `how do [action] -- [args]` or `how [action] -- [args]`.
 
     `sh build.sh "${@}"`
 
