@@ -1,8 +1,7 @@
 package org.rundeck.howto.detectors.markdown
 
-
-import spock.lang.Specification
 import org.rundeck.howto.model.DiscoveredAction
+import spock.lang.Specification
 
 class MarkdownDetectorSpec extends Specification {
     def "parse basic actions"() {
@@ -34,7 +33,7 @@ more action
 '''
         List<DiscoveredAction> actions = []
         when:
-        MarkdownDetector.parseActions(new ByteArrayInputStream(doc.bytes), null, actions)
+        MarkdownDetector.parseActions(new ByteArrayInputStream(doc.bytes), actions, null)
         then:
         actions.size() == 3
         actions[0].name == 'action1'
@@ -85,7 +84,9 @@ more action
 """
         List<DiscoveredAction> actions = []
         when:
-        MarkdownDetector.parseActions(new ByteArrayInputStream(doc.bytes), pattern, actions)
+        MarkdownDetector.parseActions(new ByteArrayInputStream(doc.bytes), actions) { docVisitor ->
+            docVisitor.h1search = pattern
+        }
         then:
         actions*.name == expect
         where:
@@ -101,6 +102,64 @@ more action
         'unrelated'              | 'other'        | MarkdownDetector.HOWTO_H1_PATTERN | []
         'unrelated'              | 'howto'        | MarkdownDetector.HOWTO_H1_PATTERN | ['something-else']
         'howto: project'         | 'howto: other' | MarkdownDetector.HOWTO_H1_PATTERN | ['action-2', 'action-3', 'something-else']
+    }
+
+    def "parse h2 header pattern"() {
+        given:
+        String doc = """# header
+ignored
+
+## action1
+
+description
+
+    action words
+
+#  other section
+
+## ${h1text} action 2
+
+more
+
+description
+
+`another action`
+
+## ${h1text} action 3
+
+blah
+
+```
+more action
+```
+
+# more
+
+## ${h1text2} something else
+
+`blah`
+"""
+        List<DiscoveredAction> actions = []
+        when:
+        MarkdownDetector.parseActions(new ByteArrayInputStream(doc.bytes), actions) { docVisitor ->
+            docVisitor.h2search = pattern
+        }
+        then:
+        actions*.name == expect
+        where:
+        h1text                   | h1text2        | pattern                           | expect
+        'howto'                  | 'other'        | MarkdownDetector.HOWTO_H1_PATTERN | ['action-2', 'action-3']
+        'HOWTO'                  | 'other'        | MarkdownDetector.HOWTO_H1_PATTERN | ['action-2', 'action-3']
+        'howto use this project' | 'other'        | MarkdownDetector.HOWTO_H1_PATTERN | ['use-this-project-action-2', 'use-this-project-action-3']
+        'how to'                 | 'other'        | MarkdownDetector.HOWTO_H1_PATTERN | ['action-2', 'action-3']
+        'how-to'                 | 'other'        | MarkdownDetector.HOWTO_H1_PATTERN | ['action-2', 'action-3']
+        'How To'                 | 'other'        | MarkdownDetector.HOWTO_H1_PATTERN | ['action-2', 'action-3']
+        'How To: do stuff'       | 'other'        | MarkdownDetector.HOWTO_H1_PATTERN | ['do-stuff-action-2', 'do-stuff-action-3']
+        'Project How-To'         | 'other'        | MarkdownDetector.HOWTO_H1_PATTERN | ['action-2', 'action-3']
+        'unrelated'              | 'other'        | MarkdownDetector.HOWTO_H1_PATTERN | []
+        'unrelated'              | 'howto'        | MarkdownDetector.HOWTO_H1_PATTERN | ['something-else']
+        'howto: project'         | 'howto: other' | MarkdownDetector.HOWTO_H1_PATTERN | ['project-action-2', 'project-action-3', 'other-something-else']
+        'also howto: project'         | 'howto: other' | MarkdownDetector.HOWTO_H1_PATTERN | ['project-action-2', 'project-action-3', 'other-something-else']
     }
 
     def "example"() {
@@ -148,7 +207,7 @@ more action
 """
         List<DiscoveredAction> actions = []
         when:
-        MarkdownDetector.parseActions(new ByteArrayInputStream(doc.bytes), null, actions)
+        MarkdownDetector.parseActions(new ByteArrayInputStream(doc.bytes), actions, null)
         then:
         actions*.name == expect
         where:
@@ -257,7 +316,7 @@ See the License for the specific language governing permissions and
 limitations under the License."""
         List<DiscoveredAction> actions = []
         when:
-        MarkdownDetector.parseActions(new ByteArrayInputStream(doc.bytes), null, actions)
+        MarkdownDetector.parseActions(new ByteArrayInputStream(doc.bytes), actions, null)
         then:
         actions*.name == expect
         where:
@@ -325,7 +384,7 @@ See the License for the specific language governing permissions and
 limitations under the License."""
         List<DiscoveredAction> actions = []
         when:
-        MarkdownDetector.parseActions(new ByteArrayInputStream(doc.bytes), null, actions)
+        MarkdownDetector.parseActions(new ByteArrayInputStream(doc.bytes), actions, null)
         then:
         actions*.name == expect
         where:

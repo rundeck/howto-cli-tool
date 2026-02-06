@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -22,7 +23,7 @@ import java.util.regex.Pattern;
  */
 public class MarkdownDetector implements Detector {
 
-    public static final Pattern HOWTO_H1_PATTERN = Pattern.compile("(?i)(.+)?how[ -]?to(\\W.+)?");
+    public static final Pattern HOWTO_H1_PATTERN = Pattern.compile("(?i)(?:.+)?how[ -]?to(?:\\W(.+))?");
 
     private static final List<String> HOWTO_FILE_NAMES = new ArrayList<>(Arrays.asList("howto.md", "howto.markdown", "howto"));
     private static final List<String> README_FILE_NAMES = new ArrayList<>(Arrays.asList("readme.md", "readme.markdown", "readme"));
@@ -45,39 +46,57 @@ public class MarkdownDetector implements Detector {
 
     @Override
     public List<DiscoveredAction> getActions(Howto howto) {
-        Pattern h1search = null;
-        File file = findMdFile(howto.getBaseDir(), HOWTO_FILE_NAMES);
-        if (null == file) {
-            //look for Howto section in readme
-            h1search = HOWTO_H1_PATTERN;
-            file = findMdFile(howto.getBaseDir(), README_FILE_NAMES);
-            if (file == null) {
-                return new ArrayList<>();
+
+        for (Strategy strategy : strategies) {
+            try {
+                List<DiscoveredAction> actions = strategy.getActions(howto);
+                if (actions != null && !actions.isEmpty()) {
+                    return actions;
+                }
+            } catch (IOException e) {
+                //ignore and try next
             }
-
         }
-
-        try {
-            return parseActions(file, h1search);
-        } catch (IOException e) {
-            return new ArrayList<>();
-        }
+        return new ArrayList<>();
     }
 
-    public static List<DiscoveredAction> parseActions(File file, Pattern h1search) throws IOException {
+    interface Strategy {
+        List<DiscoveredAction> getActions(Howto howto) throws IOException;
+    }
+
+    private static List<DiscoveredAction> parseFileWithPattern(Howto howto, List<String> names, Consumer<DocVisitor> configure) throws IOException {
+        File file = findMdFile(howto.getBaseDir(), names);
+        if (null == file) {
+            return new ArrayList<>();
+        }
+        return parseActions(file, configure);
+    }
+
+    static Strategy howtoBaseStrategy = (howto) -> parseFileWithPattern(howto, HOWTO_FILE_NAMES, null);
+    static Strategy readmeH1Strategy = (howto) -> parseFileWithPattern(howto, README_FILE_NAMES, (visitor) -> visitor.setH1search(HOWTO_H1_PATTERN));
+    static Strategy readmeH2Strategy = (howto) -> parseFileWithPattern(howto, README_FILE_NAMES, (visitor) -> visitor.setH2search(HOWTO_H1_PATTERN));
+    static List<Strategy> strategies = Arrays.asList(
+            howtoBaseStrategy,
+            readmeH1Strategy,
+            readmeH2Strategy
+    );
+
+    public static List<DiscoveredAction> parseActions(File file, Consumer<DocVisitor> configure) throws IOException {
         List<DiscoveredAction> actions = new ArrayList<>();
         try (FileInputStream is = new FileInputStream(file)) {
-            parseActions(is, h1search, actions);
+            parseActions(is, actions, configure);
         }
 
         return actions;
     }
 
-    public static void parseActions(InputStream is, Pattern h1search, List<DiscoveredAction> actions) throws IOException {
+    public static void parseActions(InputStream is, List<DiscoveredAction> actions, Consumer<DocVisitor> configure) throws IOException {
         Node document = getParser().parseReader(new InputStreamReader(is));
 
         DocVisitor visitor = new DocVisitor();
-        visitor.setH1search(h1search);
+        if (configure != null) {
+            configure.accept(visitor);
+        }
         document.accept(visitor);
         visitor.finish();
         if (visitor.getActions() != null) {
@@ -128,10 +147,20 @@ public class MarkdownDetector implements Detector {
                     state = ParseState.H2;
             }
             visitChildren(heading);
+            boolean matchedH2 = h2search == null || textCapture.value != null && h2search.matcher(textCapture.value).matches();
 
-            if (state == ParseState.H2) {
+
+            if (state == ParseState.H2 && matchedH2) {
                 state = ParseState.H2_CONTENT;
-                actionTitle(textCapture.value);
+                if(h2search == null ){
+                    actionTitle(textCapture.value);
+                } else if (textCapture.value != null){
+                    Matcher matcher = h2search.matcher(textCapture.value);
+                    if(matcher.matches()){
+                        String title = matcher.groupCount() >=1 ? matcher.group(1).trim() : textCapture.value;
+                        actionTitle(title);
+                    }
+                }
             }
             textCapture = null;
         }
@@ -266,6 +295,10 @@ public class MarkdownDetector implements Detector {
             this.h1search = h1search;
         }
 
+        public void setH2search(Pattern h2search) {
+            this.h2search = h2search;
+        }
+
         public Consumer<String> getTextCapture() {
             return textCapture;
         }
@@ -283,6 +316,7 @@ public class MarkdownDetector implements Detector {
 
         private CommandAction action;
         private Pattern h1search = null;
+        private Pattern h2search = null;
         private StringHolder textCapture = null;
         private String codeText = null;
         private ParseState state = ParseState.NONE;
