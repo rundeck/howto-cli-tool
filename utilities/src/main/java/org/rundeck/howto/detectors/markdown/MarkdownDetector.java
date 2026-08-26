@@ -12,7 +12,9 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,6 +29,15 @@ public class MarkdownDetector implements Detector {
 
     private static final List<String> HOWTO_FILE_NAMES = new ArrayList<>(Arrays.asList("howto.md", "howto.markdown", "howto"));
     private static final List<String> README_FILE_NAMES = new ArrayList<>(Arrays.asList("readme.md", "readme.markdown", "readme"));
+
+    /**
+     * Name variations for a hidden howto file. A user can create one of these
+     * and add it to .gitignore, to define local actions without editing any
+     * file that is checked into the repo. Its actions are merged on top of
+     * whatever howto.md/readme.md already defines, overriding any action
+     * with the same name.
+     */
+    static final List<String> HIDDEN_HOWTO_FILE_NAMES = new ArrayList<>(Arrays.asList(".howto.md", ".howto.markdown", ".howto"));
     private static Parser getParser() {
         return Parser.builder().extensions(Collections.singletonList(AutolinkExtension.create())).build();
     }
@@ -46,18 +57,45 @@ public class MarkdownDetector implements Detector {
 
     @Override
     public List<DiscoveredAction> getActions(Howto howto) {
-
+        List<DiscoveredAction> actions = new ArrayList<>();
         for (Strategy strategy : strategies) {
             try {
-                List<DiscoveredAction> actions = strategy.getActions(howto);
-                if (actions != null && !actions.isEmpty()) {
-                    return actions;
+                List<DiscoveredAction> found = strategy.getActions(howto);
+                if (found != null && !found.isEmpty()) {
+                    actions = found;
+                    break;
                 }
             } catch (IOException e) {
                 //ignore and try next
             }
         }
-        return new ArrayList<>();
+
+        try {
+            List<DiscoveredAction> hidden = hiddenHowtoStrategy.getActions(howto);
+            if (hidden != null && !hidden.isEmpty()) {
+                actions = mergeOverriding(actions, hidden);
+            }
+        } catch (IOException e) {
+            //ignore, fall back to base actions only
+        }
+
+        return actions;
+    }
+
+    /**
+     * Combine a base action list with an override list. An override action
+     * replaces a base action with the same name in place; any other override
+     * action is appended.
+     */
+    static List<DiscoveredAction> mergeOverriding(List<DiscoveredAction> base, List<DiscoveredAction> overrides) {
+        Map<String, DiscoveredAction> byName = new LinkedHashMap<>();
+        for (DiscoveredAction action : base) {
+            byName.put(action.getName(), action);
+        }
+        for (DiscoveredAction action : overrides) {
+            byName.put(action.getName(), action);
+        }
+        return new ArrayList<>(byName.values());
     }
 
     interface Strategy {
@@ -80,6 +118,15 @@ public class MarkdownDetector implements Detector {
             readmeH1Strategy,
             readmeH2Strategy
     );
+
+    /**
+     * Parses the hidden howto file the same way as the base howto.md file:
+     * every H2 section with a code block is an action, with no H1 gate.
+     * Applied as an overlay, not part of the strategies list, since it is
+     * merged on top of whichever strategy above wins rather than competing
+     * with them.
+     */
+    static Strategy hiddenHowtoStrategy = (howto) -> parseFileWithPattern(howto, HIDDEN_HOWTO_FILE_NAMES, null);
 
     public static List<DiscoveredAction> parseActions(File file, Consumer<DocVisitor> configure) throws IOException {
         List<DiscoveredAction> actions = new ArrayList<>();

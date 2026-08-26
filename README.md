@@ -58,11 +58,15 @@ A little luck.
    1. If there is a "how to" H1 section, it looks for H2s within that
       2. Each H2 section with a code block is treated as an action.
    2. Otherwise any H2 section with a title containing "how to" and a code block is treated as an action
-2. Otherwise, it checks various build tools, such as:
+2. It also looks for a hidden `.howto.md` file (or name variation of that). Actions found there are
+   added to the result, and any action with the same name as one already found overrides it. This
+   lets you add or override actions locally, without editing `howto.md` or `readme.md` — add the
+   file to `.gitignore` to keep it out of the repo.
+3. Otherwise, it checks various build tools, such as:
    * Gradle
    * NPM
    * ... (add your own!)
-3. It introspects available actions for the build tool(s) found
+4. It introspects available actions for the build tool(s) found
 
 ## Download
 
@@ -98,6 +102,17 @@ If you want to reference the directory containing the HOWTO doc that is used, an
     ```
     cat "${DIR}/somefile"
     ```
+
+## Adding local actions with a hidden howto file
+
+Create a `.howto.md` file (or a variation such as `.howto.markdown` or `.howto`) to add or override
+actions without touching `howto.md` or `readme.md`. This is useful for actions that only make sense
+on your machine, or for trying out a change to an action before committing it. Add `.howto.md` to
+your `.gitignore` to keep it out of the repo.
+
+A `.howto.md` file is written the same way as `howto.md`: every H2 section with a code block is an
+action, no "how to" H1 section is needed. Its actions are added to whatever `howto.md`/`readme.md`
+already defines; an action with the same name overrides the one from `howto.md`/`readme.md`.
 
 # Using other build tools
 

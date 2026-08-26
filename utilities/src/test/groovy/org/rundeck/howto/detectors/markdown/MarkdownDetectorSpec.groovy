@@ -1,9 +1,13 @@
 package org.rundeck.howto.detectors.markdown
 
+import org.rundeck.howto.Howto
 import org.rundeck.howto.model.DiscoveredAction
 import spock.lang.Specification
+import spock.lang.TempDir
 
 class MarkdownDetectorSpec extends Specification {
+    @TempDir
+    File tempDir
     def "parse basic actions"() {
         given:
         String doc = '''# header
@@ -389,5 +393,95 @@ limitations under the License."""
         actions*.name == expect
         where:
         expect = ['build-with-gradle', 'docker-build']
+    }
+
+    def "hidden howto file alone produces actions"() {
+        given:
+        new File(tempDir, '.howto.md') << '''# Howto
+
+## build
+
+    make build
+'''
+        when:
+        List<DiscoveredAction> actions = new MarkdownDetector().getActions(Howto.create(tempDir))
+        then:
+        actions*.name == ['build']
+        actions[0].invocationString == 'make build\n'
+    }
+
+    def "hidden howto file overrides same-named action in howto.md"() {
+        given:
+        new File(tempDir, 'howto.md') << '''# Howto
+
+## build
+
+    make build
+'''
+        new File(tempDir, '.howto.md') << '''# Howto
+
+## build
+
+    make override-build
+'''
+        when:
+        List<DiscoveredAction> actions = new MarkdownDetector().getActions(Howto.create(tempDir))
+        then:
+        actions*.name == ['build']
+        actions[0].invocationString == 'make override-build\n'
+    }
+
+    def "hidden howto file adds new action alongside howto.md actions"() {
+        given:
+        new File(tempDir, 'howto.md') << '''# Howto
+
+## build
+
+    make build
+'''
+        new File(tempDir, '.howto.md') << '''# Howto
+
+## extra
+
+    make extra
+'''
+        when:
+        List<DiscoveredAction> actions = new MarkdownDetector().getActions(Howto.create(tempDir))
+        then:
+        actions*.name == ['build', 'extra']
+    }
+
+    def "hidden howto file merges on top of readme.md actions"() {
+        given:
+        new File(tempDir, 'readme.md') << '''# how to
+
+## build
+
+    make build
+'''
+        new File(tempDir, '.howto.md') << '''# Howto
+
+## extra
+
+    make extra
+'''
+        when:
+        List<DiscoveredAction> actions = new MarkdownDetector().getActions(Howto.create(tempDir))
+        then:
+        actions*.name == ['build', 'extra']
+    }
+
+    def "findMdFile matches hidden howto name variations"() {
+        given:
+        new File(tempDir, fileName) << '''# Howto
+
+## build
+
+    make build
+'''
+        expect:
+        MarkdownDetector.findMdFile(tempDir, MarkdownDetector.HIDDEN_HOWTO_FILE_NAMES)?.name?.toLowerCase() == fileName.toLowerCase()
+        where:
+        fileName << ['.howto.md', '.howto.markdown', '.howto']
     }
 }
