@@ -79,13 +79,15 @@ with the same name overrides the one already found. This lets a user add or over
 locally without editing `howto.md`/`readme.md`. It parses the same way as `howto.md` (every H2 with
 a code block is an action).
 
-The H2 title becomes the action name (lowercased, spaces to hyphens). Actions are executed via
+The H2 title becomes the action name (lowercased, spaces to hyphens, with any "how to" /
+"howto" / "how-to" removed in any case; a title that is only "how to" is not an action).
+The "how to" title pattern uses a word boundary before "how", so "show to" does not match.
+Actions are executed via
 `bash -c` with the fenced/indented/inline code block content, with a `DIR` env var set to the
 detected base dir, and `"${@}"`-style trailing args appended after `--`.
 
-Note: the parser's state machine only starts capturing H2 actions after it has seen an H1 heading
-(any H1, when there's no title pattern to match) — a file with H2 sections but no H1 at all
-produces no actions.
+Note: when an H1 title pattern is required (the readme H1 strategy), the parser only captures H2
+actions under a matching H1. With no H1 pattern, H2 actions are captured even if the file has no H1.
 
 ## Compatibility note
 

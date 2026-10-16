@@ -25,7 +25,14 @@ import java.util.regex.Pattern;
  */
 public class MarkdownDetector implements Detector {
 
-    public static final Pattern HOWTO_H1_PATTERN = Pattern.compile("(?i)(?:.+)?how[ -]?to(?:\\W(.+))?");
+    //the word boundary before "how" prevents a match on words such as "show to"
+    public static final Pattern HOWTO_H1_PATTERN = Pattern.compile("(?i)(?:.+)?\\bhow[ -]?to(?:\\W(.+))?");
+
+    /**
+     * Finds "how to" (in any case and spelling) and the punctuation and
+     * spaces around it. The action name does not include this text.
+     */
+    static final Pattern HOWTO_NAME_PATTERN = Pattern.compile("(?i)\\W*\\bhow[ -]?to\\b\\W*");
 
     private static final List<String> HOWTO_FILE_NAMES = new ArrayList<>(Arrays.asList("howto.md", "howto.markdown", "howto"));
     private static final List<String> README_FILE_NAMES = new ArrayList<>(Arrays.asList("readme.md", "readme.markdown", "readme"));
@@ -189,6 +196,11 @@ public class MarkdownDetector implements Detector {
             textCapture = new StringHolder();
 
             switch (state) {
+                case NONE:
+                    //with no h1 gate, a file does not need an h1 before its h2 actions
+                    if (h1search != null) {
+                        break;
+                    }
                 case H1:
                 case H2_CONTENT:
                     state = ParseState.H2;
@@ -204,7 +216,9 @@ public class MarkdownDetector implements Detector {
                 } else if (textCapture.value != null){
                     Matcher matcher = h2search.matcher(textCapture.value);
                     if(matcher.matches()){
-                        String title = matcher.groupCount() >=1 ? matcher.group(1).trim() : textCapture.value;
+                        //the title group is optional, so a heading like "How To" has no group value
+                        String group = matcher.groupCount() >= 1 ? matcher.group(1) : null;
+                        String title = group != null ? group.trim() : textCapture.value;
                         actionTitle(title);
                     }
                 }
@@ -315,7 +329,21 @@ public class MarkdownDetector implements Detector {
 
         public void actionTitle(String string) {
             action.setTitle(string);
-            action.setName(string.toLowerCase().replaceAll("\\s+", "-"));
+            action.setName(actionName(string));
+        }
+
+        /**
+         * Make the action name from the title: remove "how to", make it
+         * lowercase, and change spaces to hyphens. If the title has only
+         * "how to", return null. An action with no name is not kept, thus
+         * a heading such as "How To" can contain other sections.
+         */
+        static String actionName(String title) {
+            String name = HOWTO_NAME_PATTERN.matcher(title).replaceAll(" ").trim();
+            if (name.isEmpty()) {
+                return null;
+            }
+            return name.toLowerCase().replaceAll("\\s+", "-");
         }
 
         public List<DiscoveredAction> getActions() {

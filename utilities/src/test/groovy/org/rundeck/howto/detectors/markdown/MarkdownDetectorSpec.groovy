@@ -166,6 +166,139 @@ more action
         'also howto: project'         | 'howto: other' | MarkdownDetector.HOWTO_H1_PATTERN | ['project-action-2', 'project-action-3', 'other-something-else']
     }
 
+    def "parse h2 actions with no h1 header"() {
+        given:
+        String doc = """
+## How to local prototype
+
+```
+npm run start:ssl
+```
+"""
+        List<DiscoveredAction> actions = []
+        when:
+        MarkdownDetector.parseActions(new ByteArrayInputStream(doc.bytes), actions) { docVisitor ->
+            docVisitor.h2search = h2search
+        }
+        then:
+        actions*.name == expect
+        where:
+        h2search                          | expect
+        null                              | ['local-prototype']
+        MarkdownDetector.HOWTO_H1_PATTERN | ['local-prototype']
+    }
+
+    def "action name removes how to from the heading"() {
+        given:
+        String doc = """
+## ${h2text}
+
+`some action`
+"""
+        List<DiscoveredAction> actions = []
+        when:
+        MarkdownDetector.parseActions(new ByteArrayInputStream(doc.bytes), actions, null)
+        then:
+        actions*.name == [expect]
+        actions*.title == [h2text]
+        where:
+        h2text                     | expect
+        'How to local prototype'   | 'local-prototype'
+        'HOWTO build'              | 'build'
+        'how-to: do stuff'         | 'do-stuff'
+        'Project How-To'           | 'project'
+        'Steps how to build it'    | 'steps-build-it'
+        'Build'                    | 'build'
+        'Show to users'            | 'show-to-users'
+        'Showtopia'                | 'showtopia'
+    }
+
+    def "heading with only how to is not an action"() {
+        given:
+        String doc = """
+## ${h2text}
+
+`some action`
+
+## build
+
+`other action`
+"""
+        List<DiscoveredAction> actions = []
+        when:
+        MarkdownDetector.parseActions(new ByteArrayInputStream(doc.bytes), actions, null)
+        then:
+        actions*.name == ['build']
+        where:
+        h2text << ['How To', 'howto', 'how-to:', ' HOW TO ']
+    }
+
+    def "h2 header pattern does not match how inside another word"() {
+        given:
+        String doc = """
+## Show to users
+
+`some action`
+
+## how to build
+
+`other action`
+"""
+        List<DiscoveredAction> actions = []
+        when:
+        MarkdownDetector.parseActions(new ByteArrayInputStream(doc.bytes), actions) { docVisitor ->
+            docVisitor.h2search = MarkdownDetector.HOWTO_H1_PATTERN
+        }
+        then:
+        actions*.name == ['build']
+    }
+
+    def "parse h1 header pattern ignores h2 actions before the h1"() {
+        given:
+        String doc = """
+## early action
+
+`early`
+
+# howto
+
+## later action
+
+`later`
+"""
+        List<DiscoveredAction> actions = []
+        when:
+        MarkdownDetector.parseActions(new ByteArrayInputStream(doc.bytes), actions) { docVisitor ->
+            docVisitor.h1search = MarkdownDetector.HOWTO_H1_PATTERN
+        }
+        then:
+        actions*.name == ['later-action']
+    }
+
+    def "parse h2 header pattern with no title after howto"() {
+        given:
+        String doc = """# header
+
+## ${h2text}
+
+```
+some action
+```
+"""
+        List<DiscoveredAction> actions = []
+        when:
+        MarkdownDetector.parseActions(new ByteArrayInputStream(doc.bytes), actions) { docVisitor ->
+            docVisitor.h2search = MarkdownDetector.HOWTO_H1_PATTERN
+        }
+        then:
+        actions*.name == expect
+        where:
+        h2text   | expect
+        'How To' | []
+        'howto'  | []
+        'how-to' | []
+    }
+
     def "example"() {
         given:
         String doc = """# header

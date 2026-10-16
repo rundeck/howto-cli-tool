@@ -83,7 +83,10 @@ Any H2 section with the words "how to" in the title that contains a code block w
 
 You can also use a H1 section where the title has the words "how to", in which case all H2 sections with code blocks below it will be selected.
 
-The heading of the H2 section will be the name of the action.
+The heading of the H2 section will be the name of the action. The name is lowercase, with spaces
+changed to hyphens. Any "how to" (or "howto", "how-to", in any case) is removed from the name, so
+`## How to build the docs` becomes the action `build-the-docs`. A heading that is only "How To" is
+not an action.
 
     ## Build
 
