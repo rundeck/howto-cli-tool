@@ -10,7 +10,6 @@ plugins {
     id 'application'
     alias(libs.plugins.shadow)
 }
-apply plugin: 'com.github.johnrengelman.shadow'
 base {
     archivesName = 'how'
 }

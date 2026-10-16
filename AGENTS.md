@@ -91,5 +91,7 @@ actions under a matching H1. With no H1 pattern, H2 actions are captured even if
 
 ## Compatibility note
 
-CI builds against JDK 11 (`.github/workflows/gradle.yml`), so avoid language features newer than
-Java 11 in `utilities`, `app`, `gradle-detector`, and `npm-detector`.
+The build uses Gradle 9 and a Java 25 toolchain (set for all subprojects in the root
+`build.gradle`), and CI builds with JDK 25. Gradle itself can run on JDK 17 or newer; it finds an
+installed JDK 25 (for example through sdkman) or downloads one through the foojay resolver plugin in
+`settings.gradle`. The released jar needs Java 25 or newer to run.

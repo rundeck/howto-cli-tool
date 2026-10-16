@@ -4,7 +4,7 @@ plugins {
 }
 
 allprojects {
-    project.version = scmVersion.version
+    project.version = rootProject.scmVersion.version
     project.group = 'org.rundeck.howto'
 }
 
@@ -12,6 +12,13 @@ subprojects { project ->
     apply plugin: 'base'
     base {
         archivesName = "how-${project.name}"
+    }
+    plugins.withType(JavaPlugin).configureEach {
+        java {
+            toolchain {
+                languageVersion = JavaLanguageVersion.of(25)
+            }
+        }
     }
     tasks.withType(JavaCompile).configureEach {
         options.compilerArgs << "-Xlint:unchecked"

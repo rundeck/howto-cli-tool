@@ -1,15 +1,15 @@
 [versions]
 
 junit = "4.13.2"
-groovy = "4.0.25"
-spock = "2.3-groovy-4.0"
-axion = "1.18.16"
-shadow = "8.1.1"
-picocli = "4.7.6"
+groovy = "4.0.33"
+spock = "2.5-groovy-4.0"
+axion = "1.21.4"
+shadow = "9.6.1"
+picocli = "4.7.7"
 commonmark = "0.17.0"
 buildconfig = "5.5.1"
 jackson = "2.18.2"
-lombok = "1.18.36"
+lombok = "1.18.48"
 [libraries]
 
 
@@ -33,5 +33,5 @@ test = ["junit", "groovy", "spock"]
 [plugins]
 
 axion = { id = "pl.allegro.tech.build.axion-release", version.ref = "axion" }
-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
